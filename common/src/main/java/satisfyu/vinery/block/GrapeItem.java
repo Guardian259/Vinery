@@ -12,12 +12,15 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.util.IBiomeDependent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class GrapeItem extends Item {
+public class GrapeItem extends Item implements IBiomeDependent {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
+    private static final ArrayList<Float> biomeTraitList = new ArrayList<>(2);
     private final Item returnItem;
 
     private final GrapevineType type;
@@ -50,4 +53,14 @@ public class GrapeItem extends Item {
         return super.finishUsingItem(stack, world, entityLiving);
     }
 
+    @Override
+    public void setBiomeTraits(Float biomeTemprature, Float biomeRainfall) {
+        biomeTraitList.add(0, biomeTemprature);
+        biomeTraitList.add(1, biomeRainfall);
+    }
+
+    @Override
+    public ArrayList<Float> getBiomeTraits() {
+        return biomeTraitList;
+    }
 }

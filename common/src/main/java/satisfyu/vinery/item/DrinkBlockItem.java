@@ -9,12 +9,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.*;
 import satisfyu.vinery.registry.ObjectRegistry;
+import satisfyu.vinery.util.FlavorTextType;
+import satisfyu.vinery.util.IRegionDependent;
 import satisfyu.vinery.util.WineYears;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
@@ -32,7 +34,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DrinkBlockItem extends BlockItem {
+public class DrinkBlockItem extends BlockItem implements IRegionDependent {
+
+    private HashMap<FlavorTextType,String> decorativeNames = new HashMap<>();
+
     public DrinkBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
@@ -165,4 +170,11 @@ public class DrinkBlockItem extends BlockItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         return ItemUtils.startUsingInstantly(level, player, interactionHand);
     }
+
+    @Override
+    public void setDecorativeName(FlavorTextType type, String name) {
+        decorativeNames.put(type, name);}
+
+    @Override
+    public String getDecorativeName(FlavorTextType flavorTextType) {return decorativeNames.getOrDefault(flavorTextType, "");}
 }
