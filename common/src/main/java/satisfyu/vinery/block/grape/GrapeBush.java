@@ -65,7 +65,7 @@ public class GrapeBush extends BushBlock implements BonemealableBlock {
             // Biome determination
             var biome = world.getBiome(pos).value();
             // Extracted resource item determination from popResource
-            var resource = getGrapeType().getItem();
+            final var resource = getGrapeType().getItem();
             // Cast GrapeItem to resource to assign biome specific traits
             ((GrapeItem) resource).setBiomeTraits(biome.getBaseTemperature(), biome.getDownfall());
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));

@@ -60,7 +60,7 @@ public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
             // Biome determination
             var biome = world.getBiome(pos).value();
             // Extracted resource item determination from popResource
-            var resource = this.type == GrapevineType.JUNGLE_RED ? ObjectRegistry.JUNGLE_RED_GRAPE.get() : ObjectRegistry.JUNGLE_WHITE_GRAPE.get();
+            final var resource = this.type == GrapevineType.JUNGLE_RED ? ObjectRegistry.JUNGLE_RED_GRAPE.get() : ObjectRegistry.JUNGLE_WHITE_GRAPE.get();
             // Cast GrapeItem to resource to assign biome specific traits
             ((GrapeItem) resource).setBiomeTraits(biome.getBaseTemperature(), biome.getDownfall());
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));

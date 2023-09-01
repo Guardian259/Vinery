@@ -11,16 +11,19 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import satisfyu.vinery.util.FlavorText;
 import satisfyu.vinery.util.GrapevineType;
 import satisfyu.vinery.util.IBiomeDependent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class GrapeItem extends Item implements IBiomeDependent {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
     private static final ArrayList<Float> biomeTraitList = new ArrayList<>(2);
+    private static final FlavorText biomeFlavorText = null;
     private final Item returnItem;
 
     private final GrapevineType type;
