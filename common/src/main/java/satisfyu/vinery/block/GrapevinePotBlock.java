@@ -10,6 +10,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BottleItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
@@ -23,8 +25,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import satisfyu.vinery.item.DrinkBlockItem;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VinerySoundEvents;
+import satisfyu.vinery.util.FlavorTextType;
 import satisfyu.vinery.util.GrapevineType;
 
 import java.util.List;
@@ -139,17 +143,21 @@ public class GrapevinePotBlock extends Block {
             return InteractionResult.SUCCESS;
         } else if (stack.is(ObjectRegistry.WINE_BOTTLE.get().asItem())) {
             if (canTakeWine(state, stack)) {
-                final ItemStack output = switch (state.getValue(GRAPEVINE_TYPE)) {
-                    case RED -> new ItemStack(ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get());
-                    case WHITE -> new ItemStack(ObjectRegistry.WHITE_GRAPEJUICE_WINE_BOTTLE.get());
-                    case SAVANNA_RED -> new ItemStack(ObjectRegistry.SAVANNA_RED_GRAPEJUICE_BOTTLE.get());
-                    case SAVANNA_WHITE -> new ItemStack(ObjectRegistry.SAVANNA_WHITE_GRAPEJUICE_BOTTLE.get());
-                    case TAIGA_RED -> new ItemStack(ObjectRegistry.TAIGA_RED_GRAPEJUICE_BOTTLE.get());
-                    case TAIGA_WHITE -> new ItemStack(ObjectRegistry.TAIGA_WHITE_GRAPEJUICE_BOTTLE.get());
-                    case JUNGLE_RED -> new ItemStack(ObjectRegistry.JUNGLE_RED_GRAPEJUICE_BOTTLE.get());
-                    case JUNGLE_WHITE -> new ItemStack(ObjectRegistry.JUNGLE_WHITE_GRAPEJUICE_BOTTLE.get());
-                    default -> new ItemStack(ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get());
+                final Item juiceOutput = switch (state.getValue(GRAPEVINE_TYPE)) {
+                    case RED -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
+                    case WHITE -> ObjectRegistry.WHITE_GRAPEJUICE_WINE_BOTTLE.get();
+                    case SAVANNA_RED -> ObjectRegistry.SAVANNA_RED_GRAPEJUICE_BOTTLE.get();
+                    case SAVANNA_WHITE -> ObjectRegistry.SAVANNA_WHITE_GRAPEJUICE_BOTTLE.get();
+                    case TAIGA_RED -> ObjectRegistry.TAIGA_RED_GRAPEJUICE_BOTTLE.get();
+                    case TAIGA_WHITE -> ObjectRegistry.TAIGA_WHITE_GRAPEJUICE_BOTTLE.get();
+                    case JUNGLE_RED -> ObjectRegistry.JUNGLE_RED_GRAPEJUICE_BOTTLE.get();
+                    case JUNGLE_WHITE -> ObjectRegistry.JUNGLE_WHITE_GRAPEJUICE_BOTTLE.get();
+                    default -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                 };
+                // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
+                ((DrinkBlockItem) juiceOutput).setDecorativeName(FlavorTextType.JUICE, "some_decorative_name");
+                // Extracted the ItemStack Creation from the final switch statement
+                var output = new ItemStack(juiceOutput);
                 int storage = state.getValue(STORAGE);
                 int newStorage = (storage - DECREMENT_PER_WINE_BOTTLE);
                 if (newStorage == 0) {
