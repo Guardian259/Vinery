@@ -156,6 +156,7 @@ public class GrapevinePotBlock extends Block {
                 };
                 // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
                 ((DrinkBlockItem) juiceOutput).setDecorativeName(FlavorTextType.JUICE, "some_decorative_name");
+                ((DrinkBlockItem) juiceOutput).setDecorativeName(FlavorTextType.JUICE_REGION, "Some_Dynamic_Region_String");
                 // Extracted the ItemStack Creation from the switch statement
                 final var output = new ItemStack(juiceOutput);
                 int storage = state.getValue(STORAGE);

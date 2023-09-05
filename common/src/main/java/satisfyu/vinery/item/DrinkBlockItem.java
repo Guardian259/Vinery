@@ -36,8 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class DrinkBlockItem extends BlockItem implements IRegionDependent {
 
-    private HashMap<FlavorTextType,String> decorativeNames = new HashMap<>();
-
+    private static final HashMap<FlavorTextType, String> flavorText = new HashMap<>(4);
     public DrinkBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
@@ -173,8 +172,8 @@ public class DrinkBlockItem extends BlockItem implements IRegionDependent {
 
     @Override
     public void setDecorativeName(FlavorTextType type, String name) {
-        decorativeNames.put(type, name);}
+        flavorText.putIfAbsent(type, name);}
 
     @Override
-    public String getDecorativeName(FlavorTextType flavorTextType) {return decorativeNames.getOrDefault(flavorTextType, "");}
+    public String getDecorativeName(FlavorTextType flavorTextType) {return flavorText.getOrDefault(flavorTextType, "");}
 }

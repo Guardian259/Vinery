@@ -13,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
@@ -24,7 +25,10 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import oshi.util.tuples.Pair;
 import satisfyu.vinery.block.GrapeItem;
+import satisfyu.vinery.util.FlavorText;
+import satisfyu.vinery.util.FlavorTextType;
 import satisfyu.vinery.util.GrapevineType;
 
 public class GrapeBush extends BushBlock implements BonemealableBlock {
@@ -67,7 +71,8 @@ public class GrapeBush extends BushBlock implements BonemealableBlock {
             // Extracted resource item determination from popResource
             final var resource = getGrapeType().getItem();
             // Cast GrapeItem to resource to assign biome specific traits
-            ((GrapeItem) resource).setBiomeTraits(biome.getBaseTemperature(), biome.getDownfall());
+            ((GrapeItem) resource).setDecorativeName(FlavorTextType.BERRY, "Some_Dynamic_String");
+            ((GrapeItem) resource).setDecorativeName(FlavorTextType.GRAPE_REGION, "Some_Dynamic_Region_String");
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));
             world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
             world.setBlock(pos, state.setValue(AGE, 1), 2);
@@ -136,6 +141,13 @@ public class GrapeBush extends BushBlock implements BonemealableBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AGE);
+    }
+
+    private Pair<FlavorTextType, String> returnBiomeTraits(Biome biome) {
+        var temerature = biome.getBaseTemperature();
+        var rainfall = biome.getDownfall();
+        Pair<String, FlavorTextType> flavorText;
+        return FlavorText.getFlavorTextFromBiomeTraits(temerature, rainfall);
     }
 
     static {
