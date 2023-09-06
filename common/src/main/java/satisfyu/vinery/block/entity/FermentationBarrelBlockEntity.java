@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import satisfyu.vinery.client.gui.handler.FermentationBarrelGuiHandler;
 import satisfyu.vinery.item.DrinkBlockItem;
+import satisfyu.vinery.item.modifier.Modifier;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VineryBlockEntityTypes;
 import satisfyu.vinery.registry.VineryRecipeTypes;
@@ -35,6 +36,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
     private static final int OUTPUT_SLOT = 5;
     private int fermentationTime = 0;
     private int totalFermentationTime;
+    private Modifier[] modifiers = new Modifier[29];
 
     private final ContainerData propertyDelegate = new ContainerData() {
 
@@ -135,8 +137,8 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
         }
         final ItemStack recipeOutput = recipe.getResultItem();
         final var outputSlotStack = this.getItem(OUTPUT_SLOT);
-        // Cast DrinkBlockItem to outputSlotStack to assign decorative name
-        ((DrinkBlockItem) outputSlotStack.getItem()).setDecorativeName(FlavorTextType.FERMENTED, "some_decorative_name");
+        // Cast DrinkBlockItem to outputSlotStack to set modifiers
+        ((DrinkBlockItem) outputSlotStack.getItem()).setModifiers(modifiers);
         if (outputSlotStack.isEmpty()) {
             ItemStack output = recipeOutput.copy();
             WineYears.setWineYear(output, this.level);

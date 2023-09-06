@@ -1,7 +1,6 @@
 package satisfyu.vinery.block.grape;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -61,7 +60,7 @@ public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
             var biome = world.getBiome(pos).value();
             // Extracted resource item determination from popResource
             final var resource = this.type == GrapevineType.JUNGLE_RED ? ObjectRegistry.JUNGLE_RED_GRAPE.get() : ObjectRegistry.JUNGLE_WHITE_GRAPE.get();
-            // Cast GrapeItem to resource to assign biome specific traits
+            // Cast GrapeItem to resource to assign modifiers
             ((GrapeItem) resource).setGrapeModifer("some_dynamic_name");
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));
             world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);

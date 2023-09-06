@@ -21,7 +21,7 @@ import java.util.List;
 public class GrapeItem extends Item {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
     private final Item returnItem;
-    private BiomeModifier grapeModifier;
+    private BiomeModifier modifier;
     private final GrapevineType type;
     public GrapeItem(Properties settings, GrapevineType type, Item returnItem) {
         super(settings);
@@ -53,10 +53,10 @@ public class GrapeItem extends Item {
     }
 
     public void setGrapeModifer(String name, Effect... effects){
-        this.grapeModifier = new BiomeModifier(Component.translatable(name), effects);
+        this.modifier = new BiomeModifier(Component.translatable(name), effects);
     }
 
     public BiomeModifier getModifier() {
-        return grapeModifier;
+        return modifier;
     }
 }

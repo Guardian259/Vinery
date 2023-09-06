@@ -58,6 +58,7 @@ public class GrapevinePotBlock extends Block {
     private static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, MAX_STAGE);
     private static final IntegerProperty STORAGE = IntegerProperty.create("storage", 0, MAX_STORAGE);
 
+    private Modifier juiceModifier;
     private Modifier[] grapeModifiers = new Modifier[GrapevinePotBlock.getMaxStorage()];
     private static final int DECREMENT_PER_WINE_BOTTLE = 3;
     private static final EnumProperty<GrapevineType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapevineType.class);
@@ -139,7 +140,8 @@ public class GrapevinePotBlock extends Block {
                     }
                 }
             }
-            if(newStage >= 1 && newStage <= 6) {
+            // Logs and increments grapeModifiers to store information on grape type used in GrapevinePotBlock
+            if(newStage >= 1 && newStage <= GrapevinePotBlock.getMaxStorage()) {
                 this.grapeModifiers[stage-1] = grape.getModifier();
             }
             if (playSound) {
@@ -160,6 +162,7 @@ public class GrapevinePotBlock extends Block {
                     default -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                 };
                 // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
+                ((DrinkBlockItem) juiceOutput).setModifiersArraySize(GrapevinePotBlock.getMaxStorage()+1);
                 ((DrinkBlockItem) juiceOutput).setModifiers(grapeModifiers);
                 // Extracted the ItemStack Creation from the switch statement
                 final var output = new ItemStack(juiceOutput);
@@ -209,6 +212,7 @@ public class GrapevinePotBlock extends Block {
         tooltip.add(Component.translatable("block.vinery.grapevinepotblock.tooltip").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
     }
 
+    // Getter method used to enforce correct storage size; Used in storing and querying grape item information used in GrapevinePotBlock
     public static int getMaxStorage() {
         return MAX_STORAGE;
     }
