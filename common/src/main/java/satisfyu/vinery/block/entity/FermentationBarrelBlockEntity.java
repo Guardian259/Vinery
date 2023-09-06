@@ -25,7 +25,6 @@ import satisfyu.vinery.item.DrinkBlockItem;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VineryBlockEntityTypes;
 import satisfyu.vinery.registry.VineryRecipeTypes;
-import satisfyu.vinery.util.FlavorTextType;
 import satisfyu.vinery.util.WineYears;
 
 public class FermentationBarrelBlockEntity extends BlockEntity implements Container, BlockEntityTicker<FermentationBarrelBlockEntity>, MenuProvider {

@@ -10,13 +10,12 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.*;
+import satisfyu.vinery.block.GrapevinePotBlock;
+import satisfyu.vinery.item.modifier.Modifier;
 import satisfyu.vinery.registry.ObjectRegistry;
-import satisfyu.vinery.util.FlavorTextType;
-import satisfyu.vinery.util.IRegionDependent;
 import satisfyu.vinery.util.WineYears;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
@@ -34,9 +33,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DrinkBlockItem extends BlockItem implements IRegionDependent {
+public class DrinkBlockItem extends BlockItem {
 
-    private static final HashMap<FlavorTextType, String> flavorText = new HashMap<>(4);
+    private Modifier[] modifiers = new Modifier[GrapevinePotBlock.getMaxStorage()];
+
     public DrinkBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
@@ -169,11 +169,12 @@ public class DrinkBlockItem extends BlockItem implements IRegionDependent {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         return ItemUtils.startUsingInstantly(level, player, interactionHand);
     }
+    
+    public void setModifiers(Modifier... grapeModifiers) {
+        this.modifiers = grapeModifiers;
+    }
 
-    @Override
-    public void setDecorativeName(FlavorTextType type, String name) {
-        flavorText.putIfAbsent(type, name);}
-
-    @Override
-    public String getDecorativeName(FlavorTextType flavorTextType) {return flavorText.getOrDefault(flavorTextType, "");}
+    public Modifier[] getModifiers() {
+        return modifiers;
+    }
 }

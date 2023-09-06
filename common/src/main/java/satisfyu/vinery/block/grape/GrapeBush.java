@@ -26,9 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import oshi.util.tuples.Pair;
-import satisfyu.vinery.block.GrapeItem;
-import satisfyu.vinery.util.FlavorText;
-import satisfyu.vinery.util.FlavorTextType;
+import satisfyu.vinery.item.GrapeItem;
 import satisfyu.vinery.util.GrapevineType;
 
 public class GrapeBush extends BushBlock implements BonemealableBlock {

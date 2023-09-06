@@ -1,6 +1,7 @@
 package satisfyu.vinery.block.grape;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -12,8 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.VineBlock;
@@ -24,11 +23,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
-import oshi.util.tuples.Pair;
-import satisfyu.vinery.block.GrapeItem;
+import satisfyu.vinery.item.GrapeItem;
 import satisfyu.vinery.registry.ObjectRegistry;
-import satisfyu.vinery.util.FlavorText;
-import satisfyu.vinery.util.FlavorTextType;
 import satisfyu.vinery.util.GrapevineType;
 
 public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
@@ -66,8 +62,7 @@ public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
             // Extracted resource item determination from popResource
             final var resource = this.type == GrapevineType.JUNGLE_RED ? ObjectRegistry.JUNGLE_RED_GRAPE.get() : ObjectRegistry.JUNGLE_WHITE_GRAPE.get();
             // Cast GrapeItem to resource to assign biome specific traits
-            ((GrapeItem) resource).setDecorativeName(FlavorTextType.BERRY, "Some_Dynamic_String");
-            ((GrapeItem) resource).setDecorativeName(FlavorTextType.GRAPE_REGION, "Some_Dynamic_Region_String");
+            ((GrapeItem) resource).setGrapeModifer("some_dynamic_name");
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));
             world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
             world.setBlock(pos, state.setValue(AGE, 1), 2);
@@ -113,14 +108,6 @@ public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
         super.createBlockStateDefinition(builder);
         builder.add(AGE, STERILIZED);
     }
-
-    private Pair<FlavorTextType, String> returnBiomeTraits(Biome biome) {
-        var temerature = biome.getBaseTemperature();
-        var rainfall = biome.getDownfall();
-        Pair<String, FlavorTextType> flavorText;
-        return FlavorText.getFlavorTextFromBiomeTraits(temerature, rainfall);
-    }
-
 
     static {
         AGE = BlockStateProperties.AGE_3;

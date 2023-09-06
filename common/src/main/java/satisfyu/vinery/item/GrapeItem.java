@@ -1,7 +1,7 @@
-package satisfyu.vinery.block;
+package satisfyu.vinery.item;
 
 
-import com.ibm.icu.impl.Pair;
+import com.mojang.blaze3d.shaders.Effect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,19 +12,16 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import satisfyu.vinery.item.modifier.BiomeModifier;
 import satisfyu.vinery.util.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
-public class GrapeItem extends Item implements IRegionDependent {
+public class GrapeItem extends Item {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
-    private static final HashMap<FlavorTextType, String> flavorText = new HashMap<>(2);
-    private static final FlavorText biomeFlavorText = null;
     private final Item returnItem;
-
+    private BiomeModifier grapeModifier;
     private final GrapevineType type;
     public GrapeItem(Properties settings, GrapevineType type, Item returnItem) {
         super(settings);
@@ -54,9 +51,12 @@ public class GrapeItem extends Item implements IRegionDependent {
         }
         return super.finishUsingItem(stack, world, entityLiving);
     }
-    @Override
-    public void setDecorativeName(FlavorTextType flavorTextType, String name) {flavorText.putIfAbsent(flavorTextType, name);}
 
-    @Override
-    public String getDecorativeName(FlavorTextType flavorTextType) {return flavorText.getOrDefault(flavorTextType, "");}
+    public void setGrapeModifer(String name, Effect... effects){
+        this.grapeModifier = new BiomeModifier(Component.translatable(name), effects);
+    }
+
+    public BiomeModifier getModifier() {
+        return grapeModifier;
+    }
 }

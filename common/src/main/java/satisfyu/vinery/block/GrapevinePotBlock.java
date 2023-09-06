@@ -10,7 +10,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BottleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,9 +25,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import satisfyu.vinery.item.DrinkBlockItem;
+import satisfyu.vinery.item.GrapeItem;
+import satisfyu.vinery.item.modifier.Modifier;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VinerySoundEvents;
-import satisfyu.vinery.util.FlavorTextType;
 import satisfyu.vinery.util.GrapevineType;
 
 import java.util.List;
@@ -57,6 +57,8 @@ public class GrapevinePotBlock extends Block {
     private static final int MAX_STORAGE = 6;
     private static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, MAX_STAGE);
     private static final IntegerProperty STORAGE = IntegerProperty.create("storage", 0, MAX_STORAGE);
+
+    private Modifier[] grapeModifiers = new Modifier[GrapevinePotBlock.getMaxStorage()];
     private static final int DECREMENT_PER_WINE_BOTTLE = 3;
     private static final EnumProperty<GrapevineType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapevineType.class);
 
@@ -137,6 +139,9 @@ public class GrapevinePotBlock extends Block {
                     }
                 }
             }
+            if(newStage >= 1 && newStage <= 6) {
+                this.grapeModifiers[stage-1] = grape.getModifier();
+            }
             if (playSound) {
                 world.playSound(player, pos, SoundEvents.CORAL_BLOCK_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
@@ -155,8 +160,7 @@ public class GrapevinePotBlock extends Block {
                     default -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                 };
                 // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
-                ((DrinkBlockItem) juiceOutput).setDecorativeName(FlavorTextType.JUICE, "some_decorative_name");
-                ((DrinkBlockItem) juiceOutput).setDecorativeName(FlavorTextType.JUICE_REGION, "Some_Dynamic_Region_String");
+                ((DrinkBlockItem) juiceOutput).setModifiers(grapeModifiers);
                 // Extracted the ItemStack Creation from the switch statement
                 final var output = new ItemStack(juiceOutput);
                 int storage = state.getValue(STORAGE);
@@ -203,6 +207,10 @@ public class GrapevinePotBlock extends Block {
     @Override
     public void appendHoverText(ItemStack itemStack, BlockGetter world, List<Component> tooltip, TooltipFlag tooltipContext) {
         tooltip.add(Component.translatable("block.vinery.grapevinepotblock.tooltip").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+    }
+
+    public static int getMaxStorage() {
+        return MAX_STORAGE;
     }
 }
 
