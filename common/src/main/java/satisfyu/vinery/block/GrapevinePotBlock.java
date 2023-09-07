@@ -59,7 +59,7 @@ public class GrapevinePotBlock extends Block {
     private static final IntegerProperty STORAGE = IntegerProperty.create("storage", 0, MAX_STORAGE);
 
     private Modifier juiceModifier;
-    private Modifier[] grapeModifiers = new Modifier[GrapevinePotBlock.getMaxStorage()];
+    private Modifier[] grapeModifiers;
     private static final int DECREMENT_PER_WINE_BOTTLE = 3;
     private static final EnumProperty<GrapevineType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapevineType.class);
 
@@ -120,6 +120,7 @@ public class GrapevinePotBlock extends Block {
             boolean playSound = false;
             // Go to stage 1
             if (stage == 0) {
+                grapeModifiers = new Modifier[GrapevinePotBlock.getMaxStorage()]; // Resets the grape modifiers array each time stage resets
                 world.setBlock(pos, this.defaultBlockState().setValue(STAGE, 1).setValue(STORAGE, 1).setValue(GRAPEVINE_TYPE, grape.getType()), Block.UPDATE_ALL);
                 playSound = true;
             }
@@ -162,8 +163,7 @@ public class GrapevinePotBlock extends Block {
                     default -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                 };
                 // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
-                ((DrinkBlockItem) juiceOutput).setModifiersArraySize(GrapevinePotBlock.getMaxStorage()+1);
-                ((DrinkBlockItem) juiceOutput).setModifiers(grapeModifiers);
+                ((DrinkBlockItem) juiceOutput).setModifiers(GrapevinePotBlock.getMaxStorage()+1, grapeModifiers);
                 // Extracted the ItemStack Creation from the switch statement
                 final var output = new ItemStack(juiceOutput);
                 int storage = state.getValue(STORAGE);

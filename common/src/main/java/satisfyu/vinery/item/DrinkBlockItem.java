@@ -169,13 +169,11 @@ public class DrinkBlockItem extends BlockItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         return ItemUtils.startUsingInstantly(level, player, interactionHand);
     }
-    
-    public void setModifiers(Modifier... grapeModifiers) {
+
+    public void setModifiers(Integer size, Modifier... grapeModifiers) {
+        this.modifierArraySize = size;
         this.modifiers = grapeModifiers;
     }
-
-    public void setModifiersArraySize(Integer size){this.modifierArraySize = size;}
-
     public Modifier[] getModifiers() {
         return modifiers;
     }
