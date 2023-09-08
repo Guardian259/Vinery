@@ -143,7 +143,7 @@ public class GrapevinePotBlock extends Block {
             }
             // Logs and increments grapeModifiers to store information on grape type used in GrapevinePotBlock
             if(newStage >= 1 && newStage <= GrapevinePotBlock.getMaxStorage()) {
-                this.grapeModifiers[stage-1] = grape.getModifier();
+                this.grapeModifiers[stage - 1] = grape.getModifier();
             }
             if (playSound) {
                 world.playSound(player, pos, SoundEvents.CORAL_BLOCK_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);

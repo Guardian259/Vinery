@@ -8,7 +8,6 @@ import java.util.List;
 import static net.minecraft.network.chat.Component.translatable;
 
 public abstract class Modifier {
-
     private final MutableComponent name;
     private final List<Effect> effects;
 
