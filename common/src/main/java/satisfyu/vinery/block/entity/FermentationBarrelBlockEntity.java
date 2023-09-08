@@ -138,7 +138,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
         final ItemStack recipeOutput = recipe.getResultItem();
         final var outputSlotStack = this.getItem(OUTPUT_SLOT);
         // Cast DrinkBlockItem to outputSlotStack to set modifiers
-        ((DrinkBlockItem) outputSlotStack.getItem()).setModifiers( CAPACITY, modifiers);
+        ((DrinkBlockItem) outputSlotStack.getItem()).setModifiers(CAPACITY, modifiers);
         if (outputSlotStack.isEmpty()) {
             ItemStack output = recipeOutput.copy();
             WineYears.setWineYear(output, this.level);
