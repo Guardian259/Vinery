@@ -24,58 +24,79 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import satisfyu.vinery.item.GrapeItem;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.item.grape.GrapeModifier;
+import satisfyu.vinery.item.grape.GrapeProperties;
+import satisfyu.vinery.item.grape.GrapeType;
 
-public class GrapeBush extends BushBlock implements BonemealableBlock {
+import java.util.Optional;
 
+public class GrapeBushBlock extends BushBlock implements GrapePlantBlock, BonemealableBlock {
     public static final IntegerProperty AGE;
     private static final VoxelShape SHAPE;
-    private final int chance;
+    
+    private Optional<GrapeModifier> grapeModifier;
+    private GrapeProperties grapeProperties;
+    public GrapeType type;
+    private int chance;
 
-    public final GrapevineType type;
-
-    public GrapeBush(Properties settings, GrapevineType type) {
-        this(settings, type, 5);
+    public GrapeBushBlock(Properties settings, GrapeType type, GrapeProperties grapeProperties, GrapeModifier grapeModifier) {
+        this(settings, type, grapeProperties, grapeModifier, 5);
+    }
+    
+    public GrapeBushBlock(Properties settings, GrapeType type, GrapeProperties grapeProperties) {
+        this(settings, type, grapeProperties, grapeModifier, 5);
     }
 
-    public GrapeBush(Properties settings, GrapevineType type, int chance) {
+    public GrapeBushBlock(Properties settings, GrapeType type, GrapeProperties grapeProperties, GrapeModifier grapeModifier, int chance) {
         super(settings);
+        
         this.chance = chance;
         this.type = type;
+        this.grapeProperties = grapeProperties;
+        this.grapeModifier = Optional.empty();
     }
-
+    
+    @Override
+    public GrapeProperties getGrapeProperties() {
+        return grapeProperties;
+    }
+    
+    @Override
+    public Optional<GrapeModifier> getGrapeModifier() {
+        return grapeModifier;
+    }
+    
+    @Override
+    public GrapeType getType() {
+        return type;
+    }
+    
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
-    public GrapevineType getType() {
-        return type;
-    }
-
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        int i = state.getValue(AGE);
-        boolean bl = i == 3;
-        if (!bl && player.getItemInHand(hand).is(Items.BONE_MEAL)) {
+        var age = state.getValue(AGE);
+        var isFullyGrown = age == 3;
+        
+        if (age < 3 && player.getItemInHand(hand).is(Items.BONE_MEAL)) {
             return InteractionResult.PASS;
-        } else if (i > 1) {
-            int x = world.random.nextInt(2);
-            // Biome determination
-            var biome = world.getBiome(pos).value();
-            // Extracted resource item determination from popResource
+        }
+        
+        if (age > 1) {
+            var grapeCount = world.random.nextInt(2) + (isFullyGrown ? 1 : 0);
             final var resource = getGrapeType().getItem();
-            // Cast GrapeItem to resource to assign modifiers
-            ((GrapeItem) resource).setGrapeModifer( "Some_Dynamic_String");
-            ((GrapeItem) resource).setGrapeModifer( "Some_Dynamic_Region_String");
-            popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));
+            popResource(world, pos, new ItemStack(resource, grapeCount));
+            
             world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
             world.setBlock(pos, state.setValue(AGE, 1), 2);
+            
             return InteractionResult.sidedSuccess(world.isClientSide);
-        } else {
-            return super.use(state, world, pos, player, hand, hit);
         }
+        
+        return super.use(state, world, pos, player, hand, hit);
     }
 
 
@@ -120,13 +141,12 @@ public class GrapeBush extends BushBlock implements BonemealableBlock {
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
-        return new ItemStack(this.type.getSeeds());
+        return new ItemStack(this.type.getSeedItem());
     }
 
     public ItemStack getGrapeType() {
-        return new ItemStack(this.type.getFruit());
+        return new ItemStack(this.type.getItem());
     }
-
 
     @Override
     public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
@@ -143,7 +163,5 @@ public class GrapeBush extends BushBlock implements BonemealableBlock {
         AGE = BlockStateProperties.AGE_3;
         SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
     }
-
-
 }
 

@@ -25,16 +25,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import satisfyu.vinery.item.DrinkBlockItem;
-import satisfyu.vinery.item.GrapeItem;
-import satisfyu.vinery.item.modifier.Modifier;
+import satisfyu.vinery.item.grape.GrapeItem;
+import satisfyu.vinery.item.grape.GrapeModifier;
+import satisfyu.vinery.item.grape.GrapeProperties;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VinerySoundEvents;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.item.grape.GrapeType;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class GrapevinePotBlock extends Block {
-
     private static final VoxelShape FILLING_SHAPE = Shapes.or(
             Block.box(15.0, 0.0, 0.0,  16.0, 10.0, 16.0),
             Block.box(0.0, 0.0, 0.0, 1.0, 10.0,  16.0),
@@ -46,26 +47,33 @@ public class GrapevinePotBlock extends Block {
             Block.box(0, 0, 0, 0, 5, 16),
             Block.box(1, 1, 1, 15, 1, 15)
     );
-    
-    
 
     private static final VoxelShape SMASHING_SHAPE = Shapes.or(
             FILLING_SHAPE,
             Block.box(0.0, 0.0, 0.0, 16.0, 4.0, 16.0)
     );
+    
     private static final int MAX_STAGE = 6;
     private static final int MAX_STORAGE = 6;
+    private static final int DECREMENT_PER_WINE_BOTTLE = 3;
     private static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, MAX_STAGE);
     private static final IntegerProperty STORAGE = IntegerProperty.create("storage", 0, MAX_STORAGE);
-
-    private Modifier juiceModifier;
-    private Modifier[] grapeModifiers;
-    private static final int DECREMENT_PER_WINE_BOTTLE = 3;
-    private static final EnumProperty<GrapevineType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapevineType.class);
+    private static final EnumProperty<GrapeType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapeType.class);
+    
+    private GrapeProperties[] grapeProperties;
+    private GrapeModifier[] grapeModifiers;
 
     public GrapevinePotBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(this.defaultBlockState().setValue(STAGE, 0).setValue(STORAGE, 0).setValue(GRAPEVINE_TYPE, GrapevineType.NONE));
+        
+        grapeProperties = new GrapeProperties[MAX_STORAGE];
+        grapeModifiers = new GrapeModifier[MAX_STORAGE];
+        
+        var defaultState = defaultBlockState().setValue(STAGE, 0)
+                .setValue(STORAGE, 0)
+                .setValue(GRAPEVINE_TYPE, GrapeType.RED);
+        
+        this.registerDefaultState(defaultState);
     }
 
     @Override
@@ -108,28 +116,36 @@ public class GrapevinePotBlock extends Block {
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         final ItemStack stack = player.getItemInHand(hand);
+        
         if (state.getValue(STAGE) > 3 || state.getValue(STORAGE) >= MAX_STORAGE) {
             if (stack.getItem() instanceof GrapeItem) {
                 return InteractionResult.PASS;
             }
         }
+        
         if (stack.getItem() instanceof GrapeItem grape) {
             if (!player.isCreative()) stack.shrink(1);
-            final int stage = state.getValue(STAGE);
-            final int storage = state.getValue(STORAGE);
+            
+            int stage = state.getValue(STAGE);
+            int storage = state.getValue(STORAGE);
             boolean playSound = false;
+            
             // Go to stage 1
             if (stage == 0) {
-                grapeModifiers = new Modifier[GrapevinePotBlock.getMaxStorage()]; // Resets the grape modifiers array each time stage resets
+                Arrays.fill(grapeProperties, null);
+                Arrays.fill(grapeModifiers, null);
+                
                 world.setBlock(pos, this.defaultBlockState().setValue(STAGE, 1).setValue(STORAGE, 1).setValue(GRAPEVINE_TYPE, grape.getType()), Block.UPDATE_ALL);
                 playSound = true;
             }
+            
             // Fill storage
             if (!isFilled(state)) {
                 final BlockState newState = world.getBlockState(pos);
                 world.setBlock(pos, newState.setValue(STORAGE, storage + 1), Block.UPDATE_ALL);
                 playSound = true;
             }
+            
             // Try to update stage
             final BlockState newState = world.getBlockState(pos); // Updated state
             final int newStage = newState.getValue(STAGE);
@@ -141,38 +157,36 @@ public class GrapevinePotBlock extends Block {
                     }
                 }
             }
+            
             // Logs and increments grapeModifiers to store information on grape type used in GrapevinePotBlock
             if(newStage >= 1 && newStage <= GrapevinePotBlock.getMaxStorage()) {
-                this.grapeModifiers[stage - 1] = grape.getModifier();
+                grapeProperties[stage - 1] = grape.get();
             }
+            
             if (playSound) {
                 world.playSound(player, pos, SoundEvents.CORAL_BLOCK_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
+            
             return InteractionResult.SUCCESS;
         } else if (stack.is(ObjectRegistry.WINE_BOTTLE.get().asItem())) {
             if (canTakeWine(state, stack)) {
                 final Item juiceOutput = switch (state.getValue(GRAPEVINE_TYPE)) {
                     case RED -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                     case WHITE -> ObjectRegistry.WHITE_GRAPEJUICE_WINE_BOTTLE.get();
-                    case SAVANNA_RED -> ObjectRegistry.SAVANNA_RED_GRAPEJUICE_BOTTLE.get();
-                    case SAVANNA_WHITE -> ObjectRegistry.SAVANNA_WHITE_GRAPEJUICE_BOTTLE.get();
-                    case TAIGA_RED -> ObjectRegistry.TAIGA_RED_GRAPEJUICE_BOTTLE.get();
-                    case TAIGA_WHITE -> ObjectRegistry.TAIGA_WHITE_GRAPEJUICE_BOTTLE.get();
-                    case JUNGLE_RED -> ObjectRegistry.JUNGLE_RED_GRAPEJUICE_BOTTLE.get();
-                    case JUNGLE_WHITE -> ObjectRegistry.JUNGLE_WHITE_GRAPEJUICE_BOTTLE.get();
                     default -> ObjectRegistry.RED_GRAPEJUICE_WINE_BOTTLE.get();
                 };
-                // Cast DrinkBlockItem to juiceOutput to add decorative name flavor text
-                ((DrinkBlockItem) juiceOutput).setModifiers(GrapevinePotBlock.getMaxStorage()+1, grapeModifiers);
+
                 // Extracted the ItemStack Creation from the switch statement
                 final var output = new ItemStack(juiceOutput);
                 int storage = state.getValue(STORAGE);
                 int newStorage = (storage - DECREMENT_PER_WINE_BOTTLE);
+                
                 if (newStorage == 0) {
                     world.setBlock(pos, world.getBlockState(pos).setValue(STORAGE,0).setValue(STAGE, 0), Block.UPDATE_ALL);
                 } else {
                     world.setBlock(pos, world.getBlockState(pos).setValue(STORAGE, newStorage), Block.UPDATE_ALL);
                 }
+                
                 if (!player.isCreative()) stack.shrink(1);
                 if (!player.getInventory().add(output)) {
                     player.drop(output, false, false);

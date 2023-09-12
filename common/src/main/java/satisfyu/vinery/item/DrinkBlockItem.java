@@ -10,7 +10,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.*;
-import satisfyu.vinery.item.modifier.Modifier;
+import satisfyu.vinery.item.grape.GrapeModifier;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.util.WineYears;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class DrinkBlockItem extends BlockItem {
 
     private Integer modifierArraySize;
-    private Modifier[] modifiers = new Modifier[modifierArraySize];
+    private GrapeModifier[] modifiers = new GrapeModifier[modifierArraySize];
 
     public DrinkBlockItem(Block block, Properties settings) {
         super(block, settings);
@@ -170,11 +170,11 @@ public class DrinkBlockItem extends BlockItem {
         return ItemUtils.startUsingInstantly(level, player, interactionHand);
     }
 
-    public void setModifiers(Integer size, Modifier... grapeModifiers) {
+    public void setModifiers(Integer size, GrapeModifier... grapeModifiers) {
         this.modifierArraySize = size;
         this.modifiers = grapeModifiers;
     }
-    public Modifier[] getModifiers() {
+    public GrapeModifier[] getModifiers() {
         return modifiers;
     }
 }

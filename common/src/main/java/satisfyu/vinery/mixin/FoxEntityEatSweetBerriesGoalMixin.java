@@ -1,7 +1,7 @@
 package satisfyu.vinery.mixin;
 
-import satisfyu.vinery.block.grape.GrapeBush;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.block.grape.GrapeBushBlock;
+import satisfyu.vinery.item.grape.GrapeType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -33,22 +33,22 @@ public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal 
     @Inject(method = "isValidTarget", at = @At("HEAD"), cancellable = true)
     private void isTargetPos(LevelReader world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof GrapeBush) {
-            cir.setReturnValue(state.getValue(GrapeBush.AGE) >= 2);
+        if (state.getBlock() instanceof GrapeBushBlock) {
+            cir.setReturnValue(state.getValue(GrapeBushBlock.AGE) >= 2);
         }
     }
 
     @Inject(method = "onReachedTarget", at = @At("TAIL"))
     private void eatGrapes(CallbackInfo ci) {
         final BlockState state = field_17975.level.getBlockState(this.blockPos);
-        if (state.getBlock() instanceof GrapeBush bush) {
+        if (state.getBlock() instanceof GrapeBushBlock bush) {
             pickGrapes(state, bush.getType());
         }
     }
 
-    private void pickGrapes(BlockState state, GrapevineType type) {
-        final int age = state.getValue(GrapeBush.AGE);
-        state.setValue(GrapeBush.AGE, 1);
+    private void pickGrapes(BlockState state, GrapeType type) {
+        final int age = state.getValue(GrapeBushBlock.AGE);
+        state.setValue(GrapeBushBlock.AGE, 1);
         int j = 1 + field_17975.level.random.nextInt(2) + (age == 3 ? 1 : 0);
         ItemStack itemStack = field_17975.getItemBySlot(EquipmentSlot.MAINHAND);
         ItemStack grape = getGrapeFor(type);
@@ -60,10 +60,10 @@ public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal 
             Block.popResource(field_17975.level, this.blockPos, new ItemStack(grape.getItem(), j));
         }
         field_17975.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 1.0F, 1.0F);
-        field_17975.level.setBlock(this.blockPos, state.setValue(GrapeBush.AGE, 1), 2);
+        field_17975.level.setBlock(this.blockPos, state.setValue(GrapeBushBlock.AGE, 1), 2);
     }
 
-    private static ItemStack getGrapeFor(GrapevineType type) {
-        return type.getFruit().getDefaultInstance();
+    private static ItemStack getGrapeFor(GrapeType type) {
+        return type.getItem().getDefaultInstance();
     }
 }

@@ -22,22 +22,41 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
-import satisfyu.vinery.item.GrapeItem;
+import satisfyu.vinery.item.grape.GrapeItem;
+import satisfyu.vinery.item.grape.GrapeModifier;
+import satisfyu.vinery.item.grape.GrapeProperties;
 import satisfyu.vinery.registry.ObjectRegistry;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.item.grape.GrapeType;
 
-public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
+import java.util.Optional;
 
-
+public class GrapeVineBlock extends VineBlock implements BonemealableBlock, GrapePlantBlock {
     public static final IntegerProperty AGE;
     public static final BooleanProperty STERILIZED;
+    
+    private Optional<GrapeModifier> grapeModifier;
+    private GrapeProperties grapeProperties;
+    public GrapeType type;
 
-    public final GrapevineType type;
-
-    public GrapeVineBlock(Properties settings, GrapevineType type) {
+    public GrapeVineBlock(Properties settings, GrapeType type) {
         super(settings);
         this.type = type;
         this.registerDefaultState(this.stateDefinition.any().setValue(STERILIZED, false).setValue(UP, false).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
+    }
+    
+    @Override
+    public GrapeProperties getGrapeProperties() {
+        return grapeProperties;
+    }
+    
+    @Override
+    public Optional<GrapeModifier> getGrapeModifier() {
+        return grapeModifier;
+    }
+    
+    @Override
+    public GrapeType getType() {
+        return type;
     }
 
     @Override
@@ -56,15 +75,14 @@ public class GrapeVineBlock extends VineBlock implements BonemealableBlock {
             return InteractionResult.PASS;
         } else if (i > 1) {
             int x = world.random.nextInt(2);
-            // Biome determination
-            var biome = world.getBiome(pos).value();
+            
             // Extracted resource item determination from popResource
-            final var resource = this.type == GrapevineType.JUNGLE_RED ? ObjectRegistry.JUNGLE_RED_GRAPE.get() : ObjectRegistry.JUNGLE_WHITE_GRAPE.get();
-            // Cast GrapeItem to resource to assign modifiers
-            ((GrapeItem) resource).setGrapeModifer("some_dynamic_name");
+            final var resource = type == GrapeType.RED ? ObjectRegistry.RED_GRAPE.get() : ObjectRegistry.WHITE_GRAPE.get();
+            
             popResource(world, pos, new ItemStack(resource, x + (bl ? 1 : 0)));
             world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
             world.setBlock(pos, state.setValue(AGE, 1), 2);
+            
             return InteractionResult.sidedSuccess(world.isClientSide);
         } else {
             return super.use(state, world, pos, player, hand, hit);

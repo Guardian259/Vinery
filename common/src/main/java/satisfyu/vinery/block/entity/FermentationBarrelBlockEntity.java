@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import satisfyu.vinery.client.gui.handler.FermentationBarrelGuiHandler;
 import satisfyu.vinery.item.DrinkBlockItem;
-import satisfyu.vinery.item.modifier.Modifier;
+import satisfyu.vinery.item.grape.GrapeModifier;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VineryBlockEntityTypes;
 import satisfyu.vinery.registry.VineryRecipeTypes;
@@ -36,7 +36,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
     private static final int OUTPUT_SLOT = 5;
     private int fermentationTime = 0;
     private int totalFermentationTime;
-    private Modifier[] modifiers = new Modifier[29];
+    private GrapeModifier[] modifiers = new GrapeModifier[29];
 
     private final ContainerData propertyDelegate = new ContainerData() {
 

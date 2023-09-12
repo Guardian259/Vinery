@@ -22,27 +22,27 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.item.grape.GrapeType;
 
 public abstract class StemBlock extends Block implements BonemealableBlock {
-    public static final EnumProperty<GrapevineType> GRAPE;
+    public static final EnumProperty<GrapeType> GRAPE;
     public static final IntegerProperty AGE;
 
     public StemBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(this.defaultBlockState().setValue(GRAPE, GrapevineType.NONE).setValue(AGE, 0));
+        this.registerDefaultState(this.defaultBlockState().setValue(GRAPE, GrapeType.NONE).setValue(AGE, 0));
     }
 
     public void dropGrapes(Level world, BlockState state, BlockPos pos) {
         final int x = 1 + world.random.nextInt(this.isMature(state) ? 2 : 1);
         final int bonus = this.isMature(state) ? 2 : 1;
-        Item grape = state.getValue(GRAPE).getFruit();
+        Item grape = state.getValue(GRAPE).getItem();
         popResource(world, pos, new ItemStack(grape, x + bonus));
         world.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
     }
 
     public void dropGrapeSeeds(Level world, BlockState state, BlockPos pos) {
-        Item grape = state.getValue(GRAPE).getSeeds();
+        Item grape = state.getValue(GRAPE).getSeedItem();
         popResource(world, pos, new ItemStack(grape));
     }
 
@@ -80,7 +80,7 @@ public abstract class StemBlock extends Block implements BonemealableBlock {
         world.setBlock(pos, this.withAge(state, age, state.getValue(GRAPE)), Block.UPDATE_CLIENTS);
     }
 
-    public BlockState withAge(BlockState state, int age, GrapevineType type) {
+    public BlockState withAge(BlockState state, int age, GrapeType type) {
         return state.setValue(AGE, age).setValue(GRAPE, type);
     }
 
@@ -108,7 +108,7 @@ public abstract class StemBlock extends Block implements BonemealableBlock {
     }
 
     static {
-        GRAPE = EnumProperty.create("grape", GrapevineType.class);
+        GRAPE = EnumProperty.create("grape", GrapeType.class);
         AGE = BlockStateProperties.AGE_4;
     }
 }

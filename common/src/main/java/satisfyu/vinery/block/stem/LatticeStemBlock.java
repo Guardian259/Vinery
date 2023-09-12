@@ -2,8 +2,8 @@ package satisfyu.vinery.block.stem;
 
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
-import satisfyu.vinery.item.GrapeBushSeedItem;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.item.grape.GrapeSeedItem;
+import satisfyu.vinery.item.grape.GrapeType;
 
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -85,13 +85,13 @@ public class LatticeStemBlock extends StemBlock {
                 dropGrapes(world, state, pos);
             }
             dropGrapeSeeds(world, state, pos);
-            world.setBlock(pos, withAge(state,0, GrapevineType.NONE), 3);
+            world.setBlock(pos, withAge(state,0, GrapeType.NONE), 3);
             world.playSound(player, pos, SoundEvents.SWEET_BERRY_BUSH_BREAK, SoundSource.AMBIENT, 1.0F, 1.0F);
             return InteractionResult.SUCCESS;
         }
 
         final ItemStack stack = player.getItemInHand(hand);
-        if (stack.getItem() instanceof GrapeBushSeedItem seed) {
+        if (stack.getItem() instanceof GrapeSeedItem seed) {
             if (age == 0) {
                 if (!seed.getType().isPaleType()) {
                     world.setBlock(pos, withAge(state,1, seed.getType()), 3);

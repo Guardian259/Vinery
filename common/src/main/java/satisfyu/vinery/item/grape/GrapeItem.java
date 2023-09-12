@@ -1,4 +1,4 @@
-package satisfyu.vinery.item;
+package satisfyu.vinery.item.grape;
 
 
 import com.mojang.blaze3d.shaders.Effect;
@@ -12,29 +12,46 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import satisfyu.vinery.item.modifier.BiomeModifier;
-import satisfyu.vinery.util.*;
-
 import java.util.List;
-
+import java.util.Optional;
 
 public class GrapeItem extends Item {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
-    private final Item returnItem;
-    private BiomeModifier modifier;
-    private final GrapevineType type;
-    public GrapeItem(Properties settings, GrapevineType type, Item returnItem) {
+    
+    private GrapeType type;
+    private GrapeProperties properties;
+    private Optional<GrapeModifier> modifier;
+    
+    public GrapeItem(Properties settings, GrapeType type) {
         super(settings);
         this.type = type;
-        this.returnItem = returnItem;
+        this.modifier = Optional.empty();
     }
-
-    public GrapevineType getType() {
+    
+    public GrapeItem(Properties settings, GrapeType type, GrapeProperties properties) {
+        this(settings, type);
+        this.properties = properties;
+    }
+    
+    public GrapeItem(Properties settings, GrapeType type, GrapeProperties properties, GrapeModifier modifier) {
+        this(settings, type, properties);
+        this.modifier = Optional.of(modifier);
+    }
+    
+    public GrapeProperties getProperties() {
+        return properties;
+    }
+    
+    public Optional<GrapeModifier> getModifier() {
+        return modifier;
+    }
+    
+    public GrapeType getType() {
         return type;
     }
 
     public void appendHoverText(ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, TooltipFlag context) {
-        tooltip.add(Component.translatable("item.vinery.grape.tooltip." + this.getDescriptionId()).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.vinery.grape.tooltip." + getDescriptionId()).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
     }
 
     @Override
@@ -42,7 +59,7 @@ public class GrapeItem extends Item {
         if (!world.isClientSide() && entityLiving instanceof Player player) {
             if (stack.getItem() == this) {
                 if (world.getRandom().nextFloat() < CHANCE_OF_GETTING_SEEDS) {
-                    ItemStack returnStack = new ItemStack(returnItem);
+                    ItemStack returnStack = new ItemStack(seedItem);
                     if (!player.getInventory().add(returnStack)) {
                         player.drop(returnStack, false);
                     }
@@ -51,12 +68,6 @@ public class GrapeItem extends Item {
         }
         return super.finishUsingItem(stack, world, entityLiving);
     }
+    
 
-    public void setGrapeModifer(String name, Effect... effects){
-        this.modifier = new BiomeModifier(Component.translatable(name), effects);
-    }
-
-    public BiomeModifier getModifier() {
-        return modifier;
-    }
 }
