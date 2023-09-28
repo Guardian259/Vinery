@@ -5,14 +5,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration;
-import satisfyu.vinery.Vinery;
-import satisfyu.vinery.block.grape.GrapeVineBlock;
-import satisfyu.vinery.registry.ObjectRegistry;
+import satisfyu.vinery.block.grape.plant.GrapeVineBlock;
 
 public class JungleGrapeFeature extends Feature<BlockStateConfiguration> {
 
@@ -64,17 +61,17 @@ public class JungleGrapeFeature extends Feature<BlockStateConfiguration> {
                         // Prevent floating vines at chunk borders
                         if(newChunkPos.x != currentChunkPos.x || newChunkPos.z != currentChunkPos.z) continue;
 
-                        currentBlockstate = context.config().state.setValue(GrapeVineBlock.getPropertyForFace(direction), true);
+                        currentBlockstate = context.config().state.setValue(GrapeVineBlock.DIRECTIONAL_PROPERTIES.get(direction), true);
                         aboveBlockstate = context.level().getBlockState(vineMutablePos.above());
 
                         if (currentBlockstate.canSurvive(context.level(), vineMutablePos) && context.level().getBlockState(vineMutablePos.relative(direction)).getBlock() != Blocks.MOSS_CARPET) {
                             //places topmost vine that can face upward
-                            context.level().setBlock(vineMutablePos, currentBlockstate.setValue(VineBlock.UP, aboveBlockstate.canOcclude()).setValue(GrapeVineBlock.AGE, context.random().nextInt(3)), 2);
+                            context.level().setBlock(vineMutablePos, currentBlockstate.setValue(GrapeVineBlock.UP, aboveBlockstate.canOcclude()).setValue(GrapeVineBlock.AGE, context.random().nextInt(3)), 2);
                             break;
                         }
                         else if (aboveBlockstate.is(context.config().state.getBlock())) {
                             //places rest of the vine as long as vine is above
-                            context.level().setBlock(vineMutablePos, aboveBlockstate.setValue(VineBlock.UP, false).setValue(GrapeVineBlock.AGE, context.random().nextInt(3)), 2);
+                            context.level().setBlock(vineMutablePos, aboveBlockstate.setValue(GrapeVineBlock.UP, false).setValue(GrapeVineBlock.AGE, context.random().nextInt(3)), 2);
                             break;
                         }
                     }

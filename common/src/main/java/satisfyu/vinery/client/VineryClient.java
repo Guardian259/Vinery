@@ -38,14 +38,12 @@ public class VineryClient {
         KeyInputHandler.register();
         VineryNetwork.registerS2CPackets();
         RenderTypeRegistry.register(RenderType.cutout(),
-                RED_GRAPE_BUSH.get(), WHITE_GRAPE_BUSH.get(), CHERRY_DOOR.get(), FERMENTATION_BARREL.get(),
+                GRAPE_BUSH.get(), GRAPE_VINES.get(), CHERRY_DOOR.get(), FERMENTATION_BARREL.get(),
                 MELLOHI_WINE.get(), CLARK_WINE.get(), BOLVAR_WINE.get(), CHERRY_WINE.get(),
                 KING_DANIS_WINE.get(), CHENET_WINE.get(), NOIR_WINE.get(), TABLE.get(), APPLE_CIDER.get(),
                 APPLE_WINE.get(), SOLARIS_WINE.get(), JELLIE_WINE.get(), AEGIS_WINE.get(), KELP_CIDER.get(),
-                SAVANNA_RED_GRAPE_BUSH.get(), SAVANNA_WHITE_GRAPE_BUSH.get(),
-                CHORUS_WINE.get(), STAL_WINE.get(), MAGNETIC_WINE.get(), STRAD_WINE.get(), JUNGLE_WHITE_GRAPE_BUSH.get(),
-                JUNGLE_RED_GRAPE_BUSH.get(), TAIGA_RED_GRAPE_BUSH.get(), TAIGA_WHITE_GRAPE_BUSH.get(),
-                GRAPEVINE_STEM.get(), GRAPEVINE_LATTICE.get(), WINE_BOX.get(), FLOWER_POT.get(), CHAIR.get(),
+                CHORUS_WINE.get(), STAL_WINE.get(), MAGNETIC_WINE.get(), STRAD_WINE.get(),
+                GRAPEVINE_POST.get(), GRAPEVINE_LATTICE.get(), WINE_BOX.get(), FLOWER_POT.get(), CHAIR.get(),
                 WINE_PRESS.get(), GRASS_SLAB.get(), CHERRY_SAPLING.get(), APPLE_TREE_SAPLING.get(),
                 KITCHEN_SINK.get(), STACKABLE_LOG.get(), APPLE_LEAVES.get(), POTTED_APPLE_TREE_SAPLING.get(),
                 POTTED_CHERRY_TREE_SAPLING.get(), RED_WINE.get(), PRAETORIAN_WINE.get(),
@@ -63,22 +61,13 @@ public class VineryClient {
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> GrassColor.get(0.5, 1.0), GRASS_SLAB);
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> FoliageColor.get(0.5, 1.0), APPLE_LEAVES_ITEM);
 
-        ColorHandlerRegistry.registerBlockColors((state,world,pos,tintIndex)->{
-                    if(world== null || pos == null){
-                        return -1;
-                    }
-                    return BiomeColors.getAverageFoliageColor(world,pos);
-                }, GRASS_SLAB.get(), TAIGA_WHITE_GRAPE_BUSH.get(), TAIGA_RED_GRAPE_BUSH.get()
-        );
-
-        ColorHandlerRegistry.registerBlockColors((state,world,pos,tintIndex)->{
-                    if(world== null || pos == null){
-                        return -1;
-                    }
-                    return BiomeColors.getAverageFoliageColor(world,pos);
-                }, SAVANNA_RED_GRAPE_BUSH.get(), SAVANNA_WHITE_GRAPE_BUSH.get(), JUNGLE_RED_GRAPE_BUSH.get(), JUNGLE_WHITE_GRAPE_BUSH.get(),
-                   GRAPEVINE_STEM.get(), GRAPEVINE_LATTICE.get(),APPLE_LEAVES.get()
-        );
+        ColorHandlerRegistry.registerBlockColors((state,world,pos,tintIndex) -> {
+            return world == null || pos == null ? -1 : BiomeColors.getAverageFoliageColor(world, pos);
+        }, GRASS_SLAB.get());
+        
+        ColorHandlerRegistry.registerBlockColors((state,world,pos,tintIndex)-> {
+            return world == null || pos == null ? -1 : BiomeColors.getAverageFoliageColor(world, pos);
+        }, GRAPE_VINES.get(), GRAPEVINE_POST.get(), GRAPEVINE_LATTICE.get(), APPLE_LEAVES.get());
 
 
 
