@@ -23,9 +23,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import satisfyu.vinery.item.GrapeItem;
 import satisfyu.vinery.registry.ObjectRegistry;
 import satisfyu.vinery.registry.VinerySoundEvents;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.block.grape.GrapeProducerType;
 
 import java.util.List;
 
@@ -54,11 +55,11 @@ public class GrapevinePotBlock extends Block {
     private static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, MAX_STAGE);
     private static final IntegerProperty STORAGE = IntegerProperty.create("storage", 0, MAX_STORAGE);
     private static final int DECREMENT_PER_WINE_BOTTLE = 3;
-    private static final EnumProperty<GrapevineType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapevineType.class);
+    private static final EnumProperty<GrapeProducerType> GRAPEVINE_TYPE = EnumProperty.create("type", GrapeProducerType.class);
 
     public GrapevinePotBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(this.defaultBlockState().setValue(STAGE, 0).setValue(STORAGE, 0).setValue(GRAPEVINE_TYPE, GrapevineType.NONE));
+        this.registerDefaultState(this.defaultBlockState().setValue(STAGE, 0).setValue(STORAGE, 0).setValue(GRAPEVINE_TYPE, GrapeProducerType.NONE));
     }
 
     @Override

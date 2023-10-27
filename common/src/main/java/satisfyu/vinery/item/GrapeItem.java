@@ -1,4 +1,4 @@
-package satisfyu.vinery.block;
+package satisfyu.vinery.item;
 
 
 import net.minecraft.ChatFormatting;
@@ -11,23 +11,20 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import satisfyu.vinery.util.GrapevineType;
+import satisfyu.vinery.block.grape.GrapeProducerType;
 
 import java.util.List;
 
-
 public class GrapeItem extends Item {
     private static final double CHANCE_OF_GETTING_SEEDS = 0.2;
-    private final Item returnItem;
 
-    private final GrapevineType type;
-    public GrapeItem(Properties settings, GrapevineType type, Item returnItem) {
+    private final GrapeProducerType type;
+    public GrapeItem(Properties settings, GrapeProducerType type) {
         super(settings);
         this.type = type;
-        this.returnItem = returnItem;
     }
 
-    public GrapevineType getType() {
+    public GrapeProducerType getType() {
         return type;
     }
 
@@ -40,7 +37,7 @@ public class GrapeItem extends Item {
         if (!world.isClientSide() && entityLiving instanceof Player player) {
             if (stack.getItem() == this) {
                 if (world.getRandom().nextFloat() < CHANCE_OF_GETTING_SEEDS) {
-                    ItemStack returnStack = new ItemStack(returnItem);
+                    var returnStack = ItemStack.of(stack.getTag().getCompound("seed"));
                     if (!player.getInventory().add(returnStack)) {
                         player.drop(returnStack, false);
                     }

@@ -15,14 +15,8 @@ public class WanderingWinemakerEntity extends WanderingTrader {
 	private static  HashMap<Integer, VillagerTrades.ItemListing[]> createTrades() {
 		HashMap<Integer, VillagerTrades.ItemListing[]> trades = new HashMap<>();
 		trades.put(1, new VillagerTrades.ItemListing[]{
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.RED_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.WHITE_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.TAIGA_RED_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.TAIGA_WHITE_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.SAVANNA_RED_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.SAVANNA_WHITE_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.JUNGLE_RED_GRAPE_SEEDS.get(), 1, 1, 8, 1),
-				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.JUNGLE_WHITE_GRAPE.get(), 1, 1, 8, 1),
+				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.GRAPE_BUSH_SEEDS.get(), 1, 1, 8, 1),
+				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.GRAPE_VINE_SEEDS.get(), 1, 1, 8, 1),
 				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.CHERRY_SAPLING.get(), 3, 1, 8, 1),
 				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.APPLE_TREE_SAPLING.get(), 5, 1, 8, 1),
 				new VillagerTrades.ItemsForEmeralds(ObjectRegistry.RED_GRAPE.get(), 2, 1, 8, 1),

@@ -20,18 +20,6 @@ public class VineryCompostableItems {
         registerCompostableItem(ObjectRegistry.CHERRY_SAPLING.get(), 0.4F);
         registerCompostableItem(ObjectRegistry.APPLE_MASH.get(), 0.4F);
         registerCompostableItem(ObjectRegistry.STRAW_HAT.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.JUNGLE_RED_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.JUNGLE_RED_GRAPE.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.JUNGLE_WHITE_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.JUNGLE_WHITE_GRAPE.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.TAIGA_RED_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.TAIGA_RED_GRAPE.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.TAIGA_WHITE_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.TAIGA_WHITE_GRAPE.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.SAVANNA_RED_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.SAVANNA_RED_GRAPE.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.SAVANNA_WHITE_GRAPE_SEEDS.get(), 0.4F);
-        registerCompostableItem(ObjectRegistry.SAVANNA_WHITE_GRAPE.get(), 0.4F);
     }
 
     public static void registerCompostableItem(ItemLike item, float chance) {

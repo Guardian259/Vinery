@@ -28,16 +28,14 @@ import satisfyu.vinery.Vinery;
 import satisfyu.vinery.VineryIdentifier;
 import satisfyu.vinery.block.FlowerPotBlock;
 import satisfyu.vinery.block.*;
-import satisfyu.vinery.block.grape.GrapeBush;
-import satisfyu.vinery.block.grape.GrapeVineBlock;
-import satisfyu.vinery.block.grape.SavannaGrapeBush;
-import satisfyu.vinery.block.grape.TaigaGrapeBush;
-import satisfyu.vinery.block.stem.LatticeStemBlock;
-import satisfyu.vinery.block.stem.PaleStemBlock;
+import satisfyu.vinery.block.grape.GrapeProducerType;
+import satisfyu.vinery.block.grape.plant.GrapeBushBlock;
+import satisfyu.vinery.block.grape.plant.GrapeVineBlock;
+import satisfyu.vinery.block.grape.support.GrapeLatticeBlock;
+import satisfyu.vinery.block.grape.support.GrapePostBlock;
 import satisfyu.vinery.block.storage.*;
 import satisfyu.vinery.item.*;
 import satisfyu.vinery.util.GeneralUtil;
-import satisfyu.vinery.util.GrapevineType;
 import satisfyu.vinery.util.generators.ConfiguredFeatureSaplingGenerator;
 import satisfyu.vinery.world.VineryConfiguredFeatures;
 
@@ -52,30 +50,20 @@ public class ObjectRegistry {
     public static final Registrar<Block> BLOCK_REGISTRAR = BLOCKS.getRegistrar();
 
     //Grapes
-    public static final RegistrySupplier<Block> RED_GRAPE_BUSH = registerB("red_grape_bush", () -> new GrapeBush(getBushSettings(), GrapevineType.RED));
-    public static final RegistrySupplier<Block> WHITE_GRAPE_BUSH = registerB("white_grape_bush", () -> new GrapeBush(getBushSettings(), GrapevineType.WHITE));
-    public static final RegistrySupplier<Item> RED_GRAPE_SEEDS = registerI("red_grape_seeds", () -> new GrapeBushSeedItem(RED_GRAPE_BUSH.get(), getSettings(), GrapevineType.RED));
-    public static final RegistrySupplier<Item> RED_GRAPE = registerI("red_grape", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.RED, RED_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Item> WHITE_GRAPE_SEEDS = registerI("white_grape_seeds", () -> new GrapeBushSeedItem(WHITE_GRAPE_BUSH.get(), getSettings(), GrapevineType.WHITE));
-    public static final RegistrySupplier<Item> WHITE_GRAPE = registerI("white_grape", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.WHITE, WHITE_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> SAVANNA_RED_GRAPE_BUSH = registerB("savanna_grape_bush_red", () -> new SavannaGrapeBush(getBushSettings(), GrapevineType.SAVANNA_RED));
-    public static final RegistrySupplier<Item> SAVANNA_RED_GRAPE_SEEDS = registerI("savanna_grape_seeds_red", () -> new GrapeBushSeedItem(SAVANNA_RED_GRAPE_BUSH.get(), getSettings(), GrapevineType.SAVANNA_RED));
-    public static final RegistrySupplier<Item> SAVANNA_RED_GRAPE = registerI("savanna_grapes_red", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.SAVANNA_RED, ObjectRegistry.SAVANNA_RED_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> SAVANNA_WHITE_GRAPE_BUSH = registerB("savanna_grape_bush_white", () -> new SavannaGrapeBush(getBushSettings(), GrapevineType.SAVANNA_WHITE));
-    public static final RegistrySupplier<Item> SAVANNA_WHITE_GRAPE_SEEDS = registerI("savanna_grape_seeds_white", () -> new GrapeBushSeedItem(SAVANNA_WHITE_GRAPE_BUSH.get(), getSettings(), GrapevineType.SAVANNA_WHITE));
-    public static final RegistrySupplier<Item> SAVANNA_WHITE_GRAPE = registerI("savanna_grapes_white", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.SAVANNA_WHITE, ObjectRegistry.SAVANNA_WHITE_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> TAIGA_RED_GRAPE_BUSH = registerB("taiga_grape_bush_red", () -> new TaigaGrapeBush(getBushSettings(), GrapevineType.TAIGA_RED));
-    public static final RegistrySupplier<Item> TAIGA_RED_GRAPE_SEEDS = registerI("taiga_grape_seeds_red", () -> new GrapeBushSeedItem(TAIGA_RED_GRAPE_BUSH.get(), getSettings(), GrapevineType.TAIGA_RED));
-    public static final RegistrySupplier<Item> TAIGA_RED_GRAPE = registerI("taiga_grapes_red", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.TAIGA_RED, ObjectRegistry.TAIGA_RED_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> TAIGA_WHITE_GRAPE_BUSH = registerB("taiga_grape_bush_white", () -> new TaigaGrapeBush(getBushSettings(), GrapevineType.TAIGA_WHITE));
-    public static final RegistrySupplier<Item> TAIGA_WHITE_GRAPE_SEEDS = registerI("taiga_grape_seeds_white", () -> new GrapeBushSeedItem(TAIGA_WHITE_GRAPE_BUSH.get(), getSettings(), GrapevineType.TAIGA_WHITE));
-    public static final RegistrySupplier<Item> TAIGA_WHITE_GRAPE = registerI("taiga_grapes_white", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapevineType.TAIGA_WHITE,ObjectRegistry.TAIGA_WHITE_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> JUNGLE_RED_GRAPE_BUSH = registerB("jungle_grape_bush_red", () -> new GrapeVineBlock(getBushSettings(), GrapevineType.JUNGLE_RED));
-    public static final RegistrySupplier<Item> JUNGLE_RED_GRAPE_SEEDS = registerI("jungle_grape_seeds_red", () -> new GrapeBushSeedItem(JUNGLE_RED_GRAPE_BUSH.get(), getSettings(), GrapevineType.JUNGLE_RED));
-    public static final RegistrySupplier<Item> JUNGLE_RED_GRAPE = registerI("jungle_grapes_red", () -> new GrapeItem(getSettings().food(Foods.BAKED_POTATO), GrapevineType.JUNGLE_RED, ObjectRegistry.JUNGLE_RED_GRAPE_SEEDS.get()));
-    public static final RegistrySupplier<Block> JUNGLE_WHITE_GRAPE_BUSH = registerB("jungle_grape_bush_white", () -> new GrapeVineBlock(getBushSettings(), GrapevineType.JUNGLE_WHITE));
-    public static final RegistrySupplier<Item> JUNGLE_WHITE_GRAPE_SEEDS = registerI("jungle_grape_seeds_white", () -> new GrapeBushSeedItem(JUNGLE_WHITE_GRAPE_BUSH.get(), getSettings(), GrapevineType.JUNGLE_WHITE));
-    public static final RegistrySupplier<Item> JUNGLE_WHITE_GRAPE = registerI("jungle_grapes_white", () -> new GrapeItem(getSettings().food(Foods.BAKED_POTATO), GrapevineType.JUNGLE_WHITE, ObjectRegistry.JUNGLE_WHITE_GRAPE_SEEDS.get()));
+    public static final RegistrySupplier<Block> GRAPE_BUSH = registerB("grape_bush", () -> new GrapeBushBlock(getGrapePlantSettings()));
+    public static final RegistrySupplier<Block> GRAPE_VINES = registerB("grape_vines", () -> new GrapeVineBlock(getGrapePlantSettings()));
+    public static final RegistrySupplier<Item> GRAPE_BUSH_SEEDS = registerI("grape_seeds", () -> new GrapeSeedItem(GRAPE_BUSH.get(), getSettings()));
+    public static final RegistrySupplier<Item> GRAPE_VINE_SEEDS = registerI("grape_vine_seeds", () -> new GrapeSeedItem(GRAPE_VINES.get(), getSettings()));
+    
+    public static final RegistrySupplier<Block> GRAPEVINE_POST = registerB("grapevine_post", () -> new GrapePostBlock(getGrapeSupportSettings()));
+    public static final RegistrySupplier<Block> GRAPEVINE_LATTICE = registerB("grapevine_lattice", () -> new GrapeLatticeBlock(getGrapeSupportSettings()));
+    public static final RegistrySupplier<Item>  GRAPEVINE_STEM_ITEM = registerI("grapevine_stem", () -> new BlockItem(GRAPEVINE_POST.get(), getSettings()));
+    public static final RegistrySupplier<Item>  GRAPEVINE_LATTICE_ITEM = registerI("grapevine_lattice", () -> new BlockItem(GRAPEVINE_LATTICE.get(), getSettings()));
+    
+    public static final RegistrySupplier<Item> RED_GRAPE = registerI("red_grape", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapeProducerType.RED));
+    public static final RegistrySupplier<Item> WHITE_GRAPE = registerI("white_grape", () -> new GrapeItem(getSettings().food(Foods.SWEET_BERRIES), GrapeProducerType.WHITE));
+    
+    
     public static final RegistrySupplier<Block> CHERRY_SAPLING = registerB("cherry_sapling", () -> new SaplingBlock(new ConfiguredFeatureSaplingGenerator() {
 
         @Override
@@ -115,8 +103,6 @@ public class ObjectRegistry {
     public static final RegistrySupplier<Item>  CHERRY_CRATE_ITEM = registerI("cherry_crate", () -> new BlockItem(CHERRY_CRATE.get(), getSettings()));
     public static final RegistrySupplier<Block> APPLE_CRATE = registerB("apple_crate", () -> new Block(BlockBehaviour.Properties.of(Material.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD)));
     public static final RegistrySupplier<Item>  APPLE_CRATE_ITEM = registerI("apple_crate", () -> new BlockItem(APPLE_CRATE.get(), getSettings()));
-    public static final RegistrySupplier<Block> GRAPEVINE_LATTICE = registerB("grapevine_lattice", () -> new LatticeStemBlock(getGrapevineSettings()));
-    public static final RegistrySupplier<Item>  GRAPEVINE_LATTICE_ITEM = registerI("grapevine_lattice", () -> new BlockItem(GRAPEVINE_LATTICE.get(), getSettings()));
     public static final RegistrySupplier<Block> GRAPEVINE_POT = registerB("grapevine_pot", () -> new GrapevinePotBlock(BlockBehaviour.Properties.copy(Blocks.BARREL)));
     public static final RegistrySupplier<Item>  GRAPEVINE_POT_ITEM = registerI("grapevine_pot", () -> new BlockItem(GRAPEVINE_POT.get(), getSettings()));
     public static final RegistrySupplier<Block> FERMENTATION_BARREL = registerB("fermentation_barrel", () -> new FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
@@ -253,8 +239,6 @@ public class ObjectRegistry {
     public static final RegistrySupplier<Item>  EISWEIN_ITEM = registerI("eiswein", () -> new DrinkBlockBigItem(EISWEIN.get(), getWineItemSettings(MobEffects.HEAL, 5)));
     public static final RegistrySupplier<Item>  WINE_BOTTLE = registerI("wine_bottle", () -> new CherryItem(getSettings()));
     public static final RegistrySupplier<Item> APPLE_MASH = registerI("apple_mash", () -> new CherryItem(getSettings().food(Foods.APPLE)));
-    public static final RegistrySupplier<Block> GRAPEVINE_STEM = registerB("grapevine_stem", () -> new PaleStemBlock(getGrapevineSettings()));
-    public static final RegistrySupplier<Item>  GRAPEVINE_STEM_ITEM = registerI("grapevine_stem", () -> new BlockItem(GRAPEVINE_STEM.get(), getSettings()));
     public static final RegistrySupplier<Block> STORAGE_POT = registerB("storage_pot", () -> new StoragePotBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD), SoundEvents.DYE_USE, SoundEvents.DYE_USE));
     public static final RegistrySupplier<Item>  STORAGE_POT_ITEM = registerI("storage_pot", () -> new BlockItem(STORAGE_POT.get(), getSettings()));
     public static final RegistrySupplier<Block> FLOWER_BOX = registerB("flower_box", () -> new FlowerBoxBlock(BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
@@ -367,7 +351,7 @@ public class ObjectRegistry {
         return component.build();
     }
 
-    private static BlockBehaviour.Properties getBushSettings() {
+    private static BlockBehaviour.Properties getGrapePlantSettings() {
         return BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH);
     }
 
@@ -376,7 +360,7 @@ public class ObjectRegistry {
         return BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).noOcclusion();
     }
 
-    private static BlockBehaviour.Properties getGrapevineSettings() {
+    private static BlockBehaviour.Properties getGrapeSupportSettings() {
         return BlockBehaviour.Properties.of(Material.WOOD).strength(2.0F).randomTicks().sound(SoundType.WOOD).noOcclusion();
     }
 
