@@ -18,9 +18,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
+/**
+ * A mixin class modifying the behavior of {@link BoneMealItem} to enhance its functionality
+ * when used by a player wearing a full winemaker armor set in a Minecraft mod environment.
+ */
 @Mixin(BoneMealItem.class)
 public abstract class BoneMealItemMixin {
 
+    /**
+     * Injects additional logic into the {@link BoneMealItem#useOn} method to refund bonemeal
+     * and damage winemaker armor when the full set bonus is active.
+     * @param context The context of the item use, including level, player, and hand.
+     * @param cir Callback info containing the return value of the original method.
+     */
     @Inject(method = "useOn", at = @At("RETURN"))
     public void useOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if (!(context.getLevel() instanceof ServerLevel)) {

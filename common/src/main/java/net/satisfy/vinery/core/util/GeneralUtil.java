@@ -48,36 +48,98 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * A utility class providing general-purpose methods for block, item, and entity management in a Minecraft mod environment.
+ */
 public class GeneralUtil {
+    /** Property for defining line connection types in block states. */
     public static final EnumProperty<LineConnectingType> LINE_CONNECTING_TYPE = EnumProperty.create("type", LineConnectingType.class);
+    /** Map tracking chair entities by dimension and block position, with associated player positions. */
     private static final Map<ResourceLocation, Map<BlockPos, Pair<ChairEntity, BlockPos>>> CHAIRS = new HashMap<>();
 
+    /**
+     * Creates a log block with properties copied from oak logs.
+     * @return A new {@link RotatedPillarBlock} instance.
+     */
     public static RotatedPillarBlock logBlock() {
         return new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG));
     }
 
+    /**
+     * Registers a block with an associated item in the given registries.
+     * @param <T> The block type.
+     * @param registerB Deferred block register.
+     * @param registrarB Block registrar.
+     * @param registerI Deferred item register.
+     * @param registrarI Item registrar.
+     * @param name The resource location for the block and item.
+     * @param block Supplier for the block instance.
+     * @return A {@link RegistrySupplier} for the registered block.
+     */
     public static <T extends Block> RegistrySupplier<T> registerWithItem(DeferredRegister<Block> registerB, Registrar<Block> registrarB, DeferredRegister<Item> registerI, Registrar<Item> registrarI, ResourceLocation name, Supplier<T> block) {
         RegistrySupplier<T> toReturn = registerWithoutItem(registerB, registrarB, name, block);
         registerItem(registerI, registrarI, name, () -> new BlockItem(toReturn.get(), new Item.Properties()));
         return toReturn;
     }
 
+    /**
+     * Registers a block without an associated item.
+     * @param <T> The block type.
+     * @param register Deferred block register.
+     * @param registrar Block registrar.
+     * @param path Resource location for the block.
+     * @param block Supplier for the block instance.
+     * @return A {@link RegistrySupplier} for the registered block.
+     */
     public static <T extends Block> RegistrySupplier<T> registerWithoutItem(DeferredRegister<Block> register, Registrar<Block> registrar, ResourceLocation path, Supplier<T> block) {
         return Platform.isForge() ? register.register(path.getPath(), block) : registrar.register(path, block);
     }
 
+    /**
+     * Registers an item in the given registry.
+     * @param <T> The item type.
+     * @param register Deferred item register.
+     * @param registrar Item registrar.
+     * @param path Resource location for the item.
+     * @param itemSupplier Supplier for the item instance.
+     * @return A {@link RegistrySupplier} for the registered item.
+     */
     public static <T extends Item> RegistrySupplier<T> registerItem(DeferredRegister<Item> register, Registrar<Item> registrar, ResourceLocation path, Supplier<T> itemSupplier) {
         return Platform.isForge() ? register.register(path.getPath(), itemSupplier) : registrar.register(path, itemSupplier);
     }
+
+    /**
+     * Retrieves players tracking a specific chunk in a server world.
+     * @param world The server level.
+     * @param pos The chunk position.
+     * @return A collection of {@link ServerPlayer} tracking the chunk.
+     * @throws NullPointerException If world or pos is null.
+     */
     public static Collection<ServerPlayer> tracking(ServerLevel world, ChunkPos pos) {
         Objects.requireNonNull(world, "The world cannot be null");
         Objects.requireNonNull(pos, "The chunk pos cannot be null");
         return world.getChunkSource().chunkMap.getPlayers(pos, false);
     }
+
+    /**
+     * Retrieves players tracking a block position’s chunk in a server world.
+     * @param world The server level.
+     * @param pos The block position.
+     * @return A collection of {@link ServerPlayer} tracking the chunk.
+     * @throws NullPointerException If pos is null.
+     */
     public static Collection<ServerPlayer> tracking(ServerLevel world, BlockPos pos) {
         Objects.requireNonNull(pos, "BlockPos cannot be null");
         return tracking(world, new ChunkPos(pos));
     }
+
+    /**
+     * Spawns an item entity from a block face with adjusted positioning.
+     * @param level The level to spawn in.
+     * @param blockPos The block position.
+     * @param side The face to spawn from.
+     * @param itemStack The item stack to spawn.
+     */
     public static void popResourceFromFace(Level level, BlockPos blockPos, Direction side, ItemStack itemStack) {
         BlockState blockState = level.getBlockState(blockPos);
         double itemWidth = EntityType.ITEM.getWidth();
@@ -123,6 +185,12 @@ public class GeneralUtil {
         popResource(level, new ItemEntity(level, posX + offsetX, posY + offsetY, posZ + offsetZ, itemStack, deltaX, deltaY, deltaZ), itemStack);
     }
 
+    /**
+     * Adds an item entity to the world if conditions allow.
+     * @param level The level to spawn in.
+     * @param itemEntity The item entity to add.
+     * @param itemStack The associated item stack.
+     */
     private static void popResource(Level level, ItemEntity itemEntity, ItemStack itemStack) {
         if (!level.isClientSide && !itemStack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
             itemEntity.setDefaultPickUpDelay();
@@ -130,6 +198,13 @@ public class GeneralUtil {
         }
     }
 
+    /**
+     * Rotates a voxel shape from one direction to another.
+     * @param from The starting direction.
+     * @param to The target direction.
+     * @param shape The voxel shape to rotate.
+     * @return The rotated {@link VoxelShape}.
+     */
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
         VoxelShape[] buffer = new VoxelShape[]{shape, Shapes.empty()};
         int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
@@ -143,6 +218,13 @@ public class GeneralUtil {
         return buffer[0];
     }
 
+    /**
+     * Calculates relative hit coordinates for a block face, excluding specified directions.
+     * @param blockHitResult The block hit result.
+     * @param direction The target face direction.
+     * @param unAllowedDirections Directions to exclude.
+     * @return An {@link Optional} with relative X and Y coordinates, or empty if invalid.
+     */
     public static Optional<Tuple<Float, Float>> getRelativeHitCoordinatesForBlockFace(
             BlockHitResult blockHitResult,
             Direction direction,
@@ -184,6 +266,11 @@ public class GeneralUtil {
         };
     }
 
+    /**
+     * Deserializes a JSON array into a list of ingredients.
+     * @param json The JSON array of ingredient data.
+     * @return A {@link NonNullList} of non-empty {@link Ingredient} objects.
+     */
     public static NonNullList<Ingredient> deserializeIngredients(JsonArray json) {
         NonNullList<Ingredient> ingredients = NonNullList.create();
 
@@ -197,6 +284,14 @@ public class GeneralUtil {
         return ingredients;
     }
 
+    /**
+     * Converts a used item stack into a return item after use by a living entity.
+     * @param entity The entity using the item.
+     * @param used The used item stack.
+     * @param returnItem The item to return.
+     * @param usedItem The item type used for stats.
+     * @return The resulting {@link ItemStack}.
+     */
     public static ItemStack convertStackAfterFinishUsing(LivingEntity entity, ItemStack used, Item returnItem, Item usedItem) {
         if (entity instanceof ServerPlayer serverPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, used);
@@ -219,6 +314,9 @@ public class GeneralUtil {
         }
     }
 
+    /**
+     * Enum defining types of line connections for block states.
+     */
     public enum LineConnectingType implements StringRepresentable {
         NONE("none"),
         MIDDLE("middle"),
@@ -231,11 +329,24 @@ public class GeneralUtil {
             this.name = type;
         }
 
+        /**
+         * Gets the serialized name of this connection type.
+         * @return The name as a string.
+         */
         public @NotNull String getSerializedName() {
             return this.name;
         }
     }
 
+    /**
+     * Handles player interaction to spawn and ride a chair entity.
+     * @param world The level.
+     * @param player The interacting player.
+     * @param hand The hand used.
+     * @param hit The block hit result.
+     * @param extraHeight Additional height offset for chair placement.
+     * @return The {@link InteractionResult} of the action.
+     */
     public static InteractionResult onUse(Level world, Player player, InteractionHand hand, BlockHitResult hit, double extraHeight) {
         if (world.isClientSide) return InteractionResult.PASS;
         if (player.isShiftKeyDown()) return InteractionResult.PASS;
@@ -255,6 +366,11 @@ public class GeneralUtil {
         return InteractionResult.PASS;
     }
 
+    /**
+     * Removes a chair entity when a block state is replaced.
+     * @param world The level.
+     * @param pos The block position.
+     */
     public static void onStateReplaced(Level world, BlockPos pos) {
         if (!world.isClientSide) {
             ChairEntity entity = GeneralUtil.getChairEntity(world, pos);
@@ -265,6 +381,14 @@ public class GeneralUtil {
         }
     }
 
+    /**
+     * Adds a chair entity to the tracking map.
+     * @param world The level.
+     * @param blockPos The block position.
+     * @param entity The chair entity.
+     * @param playerPos The player’s position.
+     * @return True if added successfully, false if client-side.
+     */
     public static boolean addChairEntity(Level world, BlockPos blockPos, ChairEntity entity, BlockPos playerPos) {
         if (!world.isClientSide) {
             ResourceLocation id = getDimensionTypeId(world);
@@ -275,6 +399,11 @@ public class GeneralUtil {
         return false;
     }
 
+    /**
+     * Removes a chair entity from the tracking map.
+     * @param world The level.
+     * @param pos The block position.
+     */
     public static void removeChairEntity(Level world, BlockPos pos) {
         if (!world.isClientSide) {
             ResourceLocation id = getDimensionTypeId(world);
@@ -284,6 +413,12 @@ public class GeneralUtil {
         }
     }
 
+    /**
+     * Retrieves a chair entity at a block position.
+     * @param world The level.
+     * @param pos The block position.
+     * @return The {@link ChairEntity} if present, null otherwise.
+     */
     public static ChairEntity getChairEntity(Level world, BlockPos pos) {
         if (!world.isClientSide()) {
             ResourceLocation id = getDimensionTypeId(world);
@@ -293,6 +428,12 @@ public class GeneralUtil {
         return null;
     }
 
+    /**
+     * Gets the previous player position associated with a chair entity.
+     * @param player The player.
+     * @param chairEntity The chair entity.
+     * @return The previous {@link BlockPos}, or null if not found.
+     */
     public static BlockPos getPreviousPlayerPosition(Player player, ChairEntity chairEntity) {
         if (!player.level().isClientSide()) {
             ResourceLocation id = getDimensionTypeId(player.level());
@@ -306,11 +447,22 @@ public class GeneralUtil {
         return null;
     }
 
+    /**
+     * Checks if a block position is occupied by a chair entity.
+     * @param world The level.
+     * @param pos The block position.
+     * @return True if occupied, false otherwise.
+     */
     public static boolean isOccupied(Level world, BlockPos pos) {
         ResourceLocation id = getDimensionTypeId(world);
         return GeneralUtil.CHAIRS.containsKey(id) && GeneralUtil.CHAIRS.get(id).containsKey(pos);
     }
 
+    /**
+     * Checks if a player is currently sitting in a chair entity.
+     * @param player The player to check.
+     * @return True if the player is sitting, false otherwise.
+     */
     public static boolean isPlayerSitting(Player player) {
         for (ResourceLocation i : CHAIRS.keySet()) {
             for (Pair<ChairEntity, BlockPos> pair : CHAIRS.get(i).values()) {
@@ -321,6 +473,11 @@ public class GeneralUtil {
         return false;
     }
 
+    /**
+     * Gets the dimension type ID of a level.
+     * @param world The level.
+     * @return The {@link ResourceLocation} of the dimension type.
+     */
     private static ResourceLocation getDimensionTypeId(Level world) {
         return world.dimensionTypeId().location();
     }

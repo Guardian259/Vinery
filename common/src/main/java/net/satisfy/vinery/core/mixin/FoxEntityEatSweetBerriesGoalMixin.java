@@ -21,16 +21,33 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * A mixin class modifying {@link Fox.FoxEatBerriesGoal} to allow foxes to target and eat grapes from
+ * {@link GrapeBush} blocks in a Minecraft mod environment.
+ */
 @Mixin(Fox.FoxEatBerriesGoal.class)
 public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal {
+    /** The fox entity associated with this goal. */
     @Final
     @Shadow
     Fox field_17975;
 
+    /**
+     * Constructs the mixin instance with the specified mob, speed, and range.
+     * @param mob The pathfinding mob (fox).
+     * @param speed The movement speed toward the target.
+     * @param range The range to search for targets.
+     */
     public FoxEntityEatSweetBerriesGoalMixin(PathfinderMob mob, double speed, int range) {
         super(mob, speed, range);
     }
 
+    /**
+     * Injects logic into {@link Fox.FoxEatBerriesGoal#isValidTarget} to validate grape bushes as targets.
+     * @param world The world reader for block state access.
+     * @param pos The block position to check.
+     * @param cir Callback info with return value, cancellable.
+     */
     @Inject(method = "isValidTarget", at = @At("HEAD"), cancellable = true)
     private void isTargetPos(LevelReader world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BlockState state = world.getBlockState(pos);
@@ -39,6 +56,10 @@ public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal 
         }
     }
 
+    /**
+     * Injects logic into {@link Fox.FoxEatBerriesGoal#onReachedTarget} to handle grape picking.
+     * @param ci Callback info for the injection.
+     */
     @Inject(method = "onReachedTarget", at = @At("TAIL"))
     private void eatGrapes(CallbackInfo ci) {
         final BlockState state = field_17975.level().getBlockState(this.blockPos);
@@ -47,6 +68,11 @@ public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal 
         }
     }
 
+    /**
+     * Handles the fox picking grapes from a grape bush, updating state and dropping items.
+     * @param state The current block state of the grape bush.
+     * @param type The grape type associated with the bush.
+     */
     @Unique
     private void pickGrapes(BlockState state, GrapeType type) {
         final int age = state.getValue(GrapeBush.AGE);
@@ -65,6 +91,11 @@ public abstract class FoxEntityEatSweetBerriesGoalMixin extends MoveToBlockGoal 
         field_17975.level().setBlock(this.blockPos, state.setValue(GrapeBush.AGE, 1), 2);
     }
 
+    /**
+     * Retrieves the grape item stack for a given grape type.
+     * @param type The grape type to get the fruit for.
+     * @return The default {@link ItemStack} for the grape type’s fruit.
+     */
     @Unique
     private static ItemStack getGrapeFor(GrapeType type) {
         return type.getFruit().getDefaultInstance();

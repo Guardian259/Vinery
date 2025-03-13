@@ -10,9 +10,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 
+/**
+ * A mixin class modifying {@link ExperienceOrb} to grant bonus experience points when collected
+ * by a player with the Experience Effect in a Minecraft mod environment.
+ */
 @Mixin(ExperienceOrb.class)
 public abstract class ExperienceOrbMixin {
 
+    /**
+     * Injects logic into {@link ExperienceOrb#playerTouch} to apply bonus XP based on the Experience Effect.
+     * @param player The player collecting the experience orb.
+     * @param ci Callback info for the injection.
+     */
     @Inject(method = "playerTouch", at = @At("HEAD"))
     public void onPlayerTouch(Player player, CallbackInfo ci) {
         if (player.hasEffect(MobEffectRegistry.EXPERIENCE_EFFECT.get())) {
