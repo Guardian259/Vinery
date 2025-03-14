@@ -31,9 +31,7 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import net.satisfy.vinery.util.GrapeType
 import kotlin.math.min
 
-@Suppress("deprecation")
-open class GrapeBush(settings: BlockBehaviour.Properties?, type: GrapeType) : BushBlock(settings), BonemealableBlock, PolymerBlock {
-    val type: GrapeType = type
+open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
 
     override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         return SHAPE

@@ -2,7 +2,7 @@ package net.satisfy.vinery
 
 import net.darktree.simpleconfig.SimpleConfig
 import net.fabricmc.api.ModInitializer
-import net.minecraft.resources.ResourceLocation
+import net.satisfy.vinery.util.VineryRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -17,6 +17,7 @@ class Vinery : ModInitializer {
         log.info("Vinery Initializing...")
         config = SimpleConfig.of("vinery").provider { filename: String -> this.getDefaultConfig(filename) }
             .request()
+        VineryRegistry
         log.info("Vinery Initializing Complete, Success!")
     }
 
@@ -26,8 +27,6 @@ class Vinery : ModInitializer {
         @JvmStatic
         var config: SimpleConfig? = null
             private set
-        @JvmStatic
-        fun id(name: String?): ResourceLocation = ResourceLocation.of(MODID, name) //TODO: Correct ResourceLocation.of
     }
 
     //TODO: Convert the Existing Cloth Config System to Simple Config
