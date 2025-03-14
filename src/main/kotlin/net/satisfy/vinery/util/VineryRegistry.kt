@@ -1,10 +1,13 @@
 package net.satisfy.vinery.util
 
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.minecraft.core.Registry.register
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.food.Foods
-import net.minecraft.world.item.Item
+import net.minecraft.world.item.*
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
@@ -30,6 +33,27 @@ object VineryRegistry {
     val TAIGA_WHITE: GrapeType = registerGrapeType("taiga_white")
     val JUNGLE_RED: GrapeType = registerGrapeType("jungle_red", true)
     val JUNGLE_WHITE: GrapeType = registerGrapeType("jungle_white", true)
+
+    /**
+     * Map of grape types to their associated bush, seed, and fruit components.
+     */
+    private val grapeComponents: MutableMap<GrapeType, GrapeComponents> = HashMap()
+
+    private val VINERY_ITEM_GROUP_KEY: ResourceKey<CreativeModeTab> = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation(MODID, "vinery"))
+    //TODO: Fix Creative Tab Generation
+//    private val VINERY_ITEM_GROUP: CreativeModeTab = FabricItemGroup.builder()
+//        .icon { ItemStack(Items.GLASS_BOTTLE) }
+//        .title(Component.translatable("vinery"))
+//        .build()
+
+    private val VINERY_ITEM_GROUP: CreativeModeTab = register(
+        BuiltInRegistries.CREATIVE_MODE_TAB,
+        VINERY_ITEM_GROUP_KEY,
+        FabricItemGroup.builder()
+            .icon { ItemStack(Items.GLASS_BOTTLE) }
+            .title(Component.translatable("itemgroup.vinery"))
+            .build()
+    )
 
     /**
      * Registers a grape type with the specified ID and no lattice requirement.
@@ -60,6 +84,11 @@ object VineryRegistry {
         log.info("Vinery Registering ${grapeType.getSerializedName()} berries, seeds, and bushes...")
         registerGrape(grapeType)
         log.info("Vinery Registering ${grapeType.getSerializedName()} berries, seeds, and bushes, Success!!!")
+        //TODO: Fix Creative Tab Generation
+//        log.info("Vinery Registering Creative Mode Tab...")
+//        register(BuiltInRegistries.CREATIVE_MODE_TAB, VINERY_ITEM_GROUP_KEY, VINERY_ITEM_GROUP)
+//        log.info("Vinery Registering Creative Mode Tab, Success!!!")
+//        modifyEntriesEvent(VINERY_ITEM_GROUP_KEY).register(addItemsToTabGroup(VINERY_ITEM_GROUP))
     } } }
 
     /**
@@ -84,12 +113,39 @@ object VineryRegistry {
 
     /**
      * Registers a grape type by creating and registering its associated bush, seeds, and fruit items.
+     * Stores the components in [grapeComponents] with names derived from the grape type’s serialized
+     * name in lowercase. The bush copies properties from sweet berry bushes, seeds are linked to
+     * the bush, and the fruit uses sweet berry food properties.
      *
      * @param type The [GrapeType] to register, typically from [GRAPE_TYPE_TYPES].
      */
     private fun registerGrape(type: GrapeType) {
-        val grapeBush = registerBlock(GrapeBush(BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH), type), "${type.serializedName.lowercase(Locale.getDefault())}_grape_bush")
-        val grapeSeeds = registerItem(GrapeBushSeedItem(grapeBush, Item.Properties(), type), "${type.serializedName.lowercase(Locale.getDefault())}_grape_seeds")
-        val grape = registerItem(GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), type, grapeSeeds), "${type.serializedName.lowercase(Locale.getDefault())}_grape")
+        val bush = registerBlock(GrapeBush(BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH), type), "${type.serializedName.lowercase(Locale.getDefault())}_grape_bush")
+        val seed = registerItem(GrapeBushSeedItem(bush, Item.Properties(), type), "${type.serializedName.lowercase(Locale.getDefault())}_grape_seeds")
+        val fruit = registerItem(GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), type, seed), "${type.serializedName.lowercase(Locale.getDefault())}_grape")
+        grapeComponents[type] = GrapeComponents(bush, seed, fruit)
+    }
+
+    /**
+     * Adds grape-related items to a Fabric item group in a specific order.
+     * Prepends all fruit items first, followed by all seed items, then all bush items
+     * from the grapeComponents map to the provided entries.
+     *
+     * @param entries The FabricItemGroupEntries collection to add items to
+     */
+    private fun addItemsToTabGroup(entries: CreativeModeTab) {
+        grapeComponents.entries.forEach { entry -> entries.displayItems.add(entry.value.fruit.asItem().defaultInstance) }
+        grapeComponents.entries.forEach { entry -> entries.displayItems.add(entry.value.seed.asItem().defaultInstance) }
+        grapeComponents.entries.forEach { entry -> entries.displayItems.add(entry.value.bush.asItem().defaultInstance) }
     }
 }
+
+/**
+ * A data class representing the components associated with a grape type in the Vinery mod.
+ * Holds references to the grape bush block, seed item, and fruit item for a specific [GrapeType].
+ *
+ * @property bush The [Block] representing the grape bush.
+ * @property seed The [Item] representing the grape seeds, linked to the bush.
+ * @property fruit The [Item] representing the grape fruit, tied to the seed and bush.
+ */
+data class GrapeComponents(val bush: Block, val seed: Item, val fruit: Item)
