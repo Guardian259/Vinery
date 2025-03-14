@@ -16,6 +16,7 @@ import net.satisfy.vinery.Vinery.Companion.log
 import net.satisfy.vinery.block.GrapeBush
 import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.item.GrapeItem
+import net.satisfy.vinery.item.VineryItem
 import java.util.*
 
 
@@ -34,6 +35,7 @@ object VineryRegistry {
     val JUNGLE_RED: GrapeType = registerGrapeType("jungle_red", true)
     val JUNGLE_WHITE: GrapeType = registerGrapeType("jungle_white", true)
 
+    val WINE_BOTTLE = registerItem(VineryItem(Item.Properties()), "wine_bottle")
     /**
      * Map of grape types to their associated bush, seed, and fruit components.
      */
