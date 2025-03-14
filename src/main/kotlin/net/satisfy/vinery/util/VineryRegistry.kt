@@ -52,43 +52,6 @@ object VineryRegistry {
         return grapeType
     }
 
-    //TODO:Finish Registration
-//
-//    fun addGrapeAttributes() {
-//        RED.setItems(ObjectRegistry.RED_GRAPE, ObjectRegistry.RED_GRAPE_SEEDS, ObjectRegistry.RED_GRAPEJUICE)
-//        WHITE.setItems(ObjectRegistry.WHITE_GRAPE, ObjectRegistry.WHITE_GRAPE_SEEDS, ObjectRegistry.WHITE_GRAPEJUICE)
-//        SAVANNA_RED.setItems(
-//            ObjectRegistry.SAVANNA_RED_GRAPE,
-//            ObjectRegistry.SAVANNA_RED_GRAPE_SEEDS,
-//            ObjectRegistry.RED_SAVANNA_GRAPEJUICE
-//        )
-//        SAVANNA_WHITE.setItems(
-//            ObjectRegistry.SAVANNA_WHITE_GRAPE,
-//            ObjectRegistry.SAVANNA_WHITE_GRAPE_SEEDS,
-//            ObjectRegistry.WHITE_SAVANNA_GRAPEJUICE
-//        )
-//        TAIGA_RED.setItems(
-//            ObjectRegistry.TAIGA_RED_GRAPE,
-//            ObjectRegistry.TAIGA_RED_GRAPE_SEEDS,
-//            ObjectRegistry.RED_TAIGA_GRAPEJUICE
-//        )
-//        TAIGA_WHITE.setItems(
-//            ObjectRegistry.TAIGA_WHITE_GRAPE,
-//            ObjectRegistry.TAIGA_WHITE_GRAPE_SEEDS,
-//            ObjectRegistry.WHITE_TAIGA_GRAPEJUICE
-//        )
-//        JUNGLE_RED.setItems(
-//            ObjectRegistry.JUNGLE_RED_GRAPE,
-//            ObjectRegistry.JUNGLE_RED_GRAPE_SEEDS,
-//            ObjectRegistry.RED_JUNGLE_GRAPEJUICE
-//        )
-//        JUNGLE_WHITE.setItems(
-//            ObjectRegistry.JUNGLE_WHITE_GRAPE,
-//            ObjectRegistry.JUNGLE_WHITE_GRAPE_SEEDS,
-//            ObjectRegistry.WHITE_JUNGLE_GRAPEJUICE
-//        )
-//    }
-
     /**
      * Initializes the registry by registering all grape types in [GRAPE_TYPE_TYPES] except [NONE].
      * Logs the registration process for each grape type.
