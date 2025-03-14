@@ -10,10 +10,12 @@ import net.minecraft.world.food.Foods
 import net.minecraft.world.item.*
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.Vinery.Companion.log
 import net.satisfy.vinery.block.GrapeBush
+import net.satisfy.vinery.block.PaleStemBlock
 import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.item.GrapeItem
 import net.satisfy.vinery.item.VineryItem
@@ -36,6 +38,9 @@ object VineryRegistry {
     val JUNGLE_WHITE: GrapeType = registerGrapeType("jungle_white", true)
 
     val WINE_BOTTLE = registerItem(VineryItem(Item.Properties()), "wine_bottle")
+
+    val GRAPEVINE_STEM = registerBlock(PaleStemBlock(getGrapevineSettings()), "grapevine_stem")
+
     /**
      * Map of grape types to their associated bush, seed, and fruit components.
      */
@@ -140,6 +145,11 @@ object VineryRegistry {
         grapeComponents.entries.forEach { entry -> entries.displayItems.add(entry.value.seed.asItem().defaultInstance) }
         grapeComponents.entries.forEach { entry -> entries.displayItems.add(entry.value.bush.asItem().defaultInstance) }
     }
+
+    private fun getGrapevineSettings(): BlockBehaviour.Properties {
+        return BlockBehaviour.Properties.of().strength(2.0f).randomTicks().sound(SoundType.WOOD).noOcclusion()
+    }
+
 }
 
 /**
