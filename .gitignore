@@ -9,6 +9,7 @@ out/
 output/
 bin/
 libs/
+/run/
 
 .classpath
 .project
