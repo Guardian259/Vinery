@@ -26,8 +26,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.satisfy.vinery.item.GrapeBushSeedItem
-import net.satisfy.vinery.util.GrapeType
-import net.satisfy.vinery.util.VineryRegistry
+import net.satisfy.vinery.util.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 import java.util.*
 import kotlin.math.max
@@ -35,11 +34,7 @@ import kotlin.math.max
 @SuppressWarnings("deprecation")
 class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
     init {
-        this.registerDefaultState(
-            defaultBlockState().setValue<GrapeType, GrapeType>(GRAPE, VineryRegistry.NONE).setValue<Int, Int>(
-                AGE, 0
-            )
-        )
+        this.registerDefaultState(defaultBlockState().setValue(GRAPE, VineryGrapeRegistry.NONE).setValue(AGE, 0))
     }
 
     @NotNull
@@ -89,11 +84,11 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
     override fun use(
         state: BlockState,
         world: Level,
-        pos: BlockPos?,
-        player: Player?,
-        hand: InteractionHand?,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
         hit: BlockHitResult
-    ): InteractionResult {
+    ): InteractionResult? {
         if (hand === InteractionHand.OFF_HAND) {
             return super.use(state, world, pos, player, hand, hit)
         }

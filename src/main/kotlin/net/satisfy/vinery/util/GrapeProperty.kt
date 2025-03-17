@@ -4,8 +4,8 @@ import net.minecraft.world.level.block.state.properties.Property
 import java.util.*
 
 
-class GrapeProperty protected constructor(name: String?) : Property<GrapeType>(name, GrapeType::class.java) {
-    private val values: Set<GrapeType> = VineryRegistry.GRAPE_TYPE_TYPES
+class GrapeProperty protected constructor(name: String?) : Property<GrapeType>(name.toString(), GrapeType::class.java) {
+    private val values: Set<GrapeType> = VineryGrapeRegistry.GRAPE_TYPES
 
     override fun getPossibleValues() = this.values
 

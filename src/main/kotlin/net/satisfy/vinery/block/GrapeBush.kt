@@ -169,6 +169,8 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
             return false
         }
     }
+//    VineryObjectRegistry.grapeSets[VineryObjectRegistry.GrapeVariant.valueOf(this.grapeType.descriptionId)]?.bush
+//    fun getPickStack(world: LevelReader?, pos: BlockPos?, state: BlockState?): ItemStack = ItemStack(ModItems.BLACKCURRANTS)
 
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.SWEET_BERRY_BUSH
 

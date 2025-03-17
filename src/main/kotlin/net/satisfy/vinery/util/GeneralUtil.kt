@@ -75,14 +75,14 @@ object GeneralUtil {
         }
     }
 
-    enum class LineConnectingType(name: String) : StringRepresentable {
+    enum class LineConnectingType(private val serializedName: String) : StringRepresentable {
         NONE("none"),
         MIDDLE("middle"),
         LEFT("left"),
         RIGHT("right");
 
         override fun getSerializedName(): String {
-            return this.name
+            return serializedName
         }
     }
 }

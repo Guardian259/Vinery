@@ -6,6 +6,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-class VineryItem(properties: Properties?)  : Item(properties), PolymerItem {
+class VineryItem(properties: Properties?)  : Item(properties!!), PolymerItem {
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.GLASS_BOTTLE
 }

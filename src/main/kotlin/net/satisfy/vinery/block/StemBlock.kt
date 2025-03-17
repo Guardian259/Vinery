@@ -26,17 +26,17 @@ import net.minecraft.world.phys.BlockHitResult
 import net.satisfy.vinery.util.GeneralUtil
 import net.satisfy.vinery.util.GrapeProperty
 import net.satisfy.vinery.util.GrapeType
-import net.satisfy.vinery.util.VineryRegistry
+import net.satisfy.vinery.util.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 
-abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableBlock, PolymerBlock {
+abstract class StemBlock(settings: Properties?) : Block(settings!!), BonemealableBlock, PolymerBlock {
     fun dropGrapes(world: Level, state: BlockState, pos: BlockPos?, direction: Direction?) {
         val x: Int = 1 + world.random.nextInt(if (this.isMature(state)) 2 else 1)
         val bonus = if (this.isMature(state)) 2 else 1
         val grape: Item = state.getValue(GRAPE).getFruit()
         val stack: ItemStack = ItemStack(grape, x + bonus)
 
-        if (direction == null) popResource(world, pos, stack)
+        if (direction == null) popResource(world, pos!!, stack)
         else GeneralUtil.popResourceFromFace(world, pos!!, direction, stack)
 
         world.playSound(
@@ -53,20 +53,19 @@ abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableB
         val grape: Item = state.getValue(GRAPE).getSeeds()
         val stack: ItemStack = ItemStack(grape)
 
-        if (direction == null) popResource(world, pos, stack)
+        if (direction == null) popResource(world!!, pos!!, stack)
         else GeneralUtil.popResourceFromFace(world!!, pos!!, direction, stack)
     }
 
-    @Suppress("deprecation")
     @NotNull
     override fun use(
         state: BlockState,
         world: Level,
-        pos: BlockPos?,
-        player: Player?,
-        hand: InteractionHand?,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
         hit: BlockHitResult
-    ): InteractionResult {
+    ): InteractionResult? {
         val age: Int = state.getValue(AGE)
         if (age > 3) {
             dropGrapes(world, state, pos, hit.getDirection())
@@ -77,7 +76,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableB
         }
     }
 
-    override fun playerWillDestroy(world: Level, pos: BlockPos?, state: BlockState, player: Player?) {
+    override fun playerWillDestroy(world: Level, pos: BlockPos, state: BlockState, player: Player) {
         if (state.getValue(AGE) > 2) {
             dropGrapes(world, state, pos, null)
         }
@@ -85,7 +84,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableB
     }
 
     fun hasTrunk(world: Level, pos: BlockPos): Boolean {
-        return world.getBlockState(pos.below()).getBlock() === this
+        return world.getBlockState(pos.below()).block === this
     }
 
     private fun boneMealGrow(world: Level, state: BlockState, pos: BlockPos) {
@@ -94,16 +93,12 @@ abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableB
         if (age > (4.also { j = it })) {
             age = j
         }
-        world.setBlock(pos, this.withAge(state, age, state.getValue(GRAPE)), Block.UPDATE_CLIENTS)
+        world.setBlock(pos, this.withAge(state, age, state.getValue(GRAPE)), UPDATE_CLIENTS)
     }
 
-    init {
-        this.registerDefaultState(this.defaultBlockState().setValue(GRAPE, VineryRegistry.NONE).setValue(AGE, 0))
-    }
+    init { this.registerDefaultState(this.defaultBlockState().setValue(GRAPE, VineryGrapeRegistry.NONE).setValue(AGE, 0)) }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
-        builder.add(AGE, GRAPE)
-    }
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) { builder.add(AGE, GRAPE) } //TODO: SYSTEM IS ERRORING OUT HERE
 
     fun isMature(state: BlockState): Boolean {
         return state.getValue(AGE) >= 4
@@ -111,14 +106,14 @@ abstract class StemBlock(settings: Properties?) : Block(settings), BonemealableB
 
     override fun isValidBonemealTarget(levelReader: LevelReader, blockPos: BlockPos, state: BlockState, bl: Boolean): Boolean {
         return !isMature(state) && levelReader.getBlockState(blockPos.below())
-            .getBlock() === this && state.getValue(AGE) > 0
+            .block === this && state.getValue(AGE) > 0
     }
 
-    override fun isBonemealSuccess(world: Level?, random: RandomSource?, pos: BlockPos?, state: BlockState?): Boolean {
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
         return true
     }
 
-    override fun performBonemeal(world: ServerLevel, random: RandomSource?, pos: BlockPos, state: BlockState) {
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
         boneMealGrow(world, state, pos)
     }
 

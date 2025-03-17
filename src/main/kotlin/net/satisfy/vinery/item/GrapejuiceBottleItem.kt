@@ -14,10 +14,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
-import net.satisfy.vinery.util.VineryRegistry
+import net.satisfy.vinery.util.VineryGrapeRegistry
 
 
-class GrapejuiceBottleItem(properties: Properties?) : Item(properties), PolymerItem {
+class GrapejuiceBottleItem(properties: Properties?) : Item(properties!!), PolymerItem {
     override fun finishUsingItem(itemStack: ItemStack, level: Level, livingEntity: LivingEntity): ItemStack {
         if (livingEntity is ServerPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(livingEntity, itemStack)
@@ -28,10 +28,10 @@ class GrapejuiceBottleItem(properties: Properties?) : Item(properties), PolymerI
             livingEntity.removeEffect(MobEffects.POISON)
         }
 
-        if (livingEntity is Player && !livingEntity.getAbilities().instabuild) {
+        if (livingEntity is Player && !livingEntity.abilities.instabuild) {
             itemStack.shrink(1)
-            val itemStack2: ItemStack = ItemStack(VineryRegistry.WINE_BOTTLE.asItem())
-            if (!livingEntity.getInventory().add(itemStack2)) {
+            val itemStack2: ItemStack = ItemStack(VineryGrapeRegistry.WINE_BOTTLE.asItem())
+            if (!livingEntity.inventory.add(itemStack2)) {
                 livingEntity.drop(itemStack2, false)
             }
         }
@@ -40,29 +40,15 @@ class GrapejuiceBottleItem(properties: Properties?) : Item(properties), PolymerI
     }
 
 
-    override fun getUseDuration(itemStack: ItemStack): Int {
-        return 40
-    }
+    override fun getUseDuration(itemStack: ItemStack): Int = 40
 
-    override fun getUseAnimation(itemStack: ItemStack): UseAnim {
-        return UseAnim.DRINK
-    }
+    override fun getUseAnimation(itemStack: ItemStack): UseAnim = UseAnim.DRINK
 
-    override fun getDrinkingSound(): SoundEvent {
-        return SoundEvents.HONEY_DRINK
-    }
+    override fun getDrinkingSound(): SoundEvent = SoundEvents.HONEY_DRINK
 
-    override fun getEatingSound(): SoundEvent {
-        return SoundEvents.HONEY_DRINK
-    }
+    override fun getEatingSound(): SoundEvent = SoundEvents.HONEY_DRINK
 
-    override fun use(
-        level: Level?,
-        player: Player?,
-        interactionHand: InteractionHand?
-    ): InteractionResultHolder<ItemStack> {
-        return ItemUtils.startUsingInstantly(level, player, interactionHand)
-    }
+    override fun use(level: Level, player: Player, interactionHand: InteractionHand): InteractionResultHolder<ItemStack>? = ItemUtils.startUsingInstantly(level, player, interactionHand)
 
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.GLASS_BOTTLE
 }

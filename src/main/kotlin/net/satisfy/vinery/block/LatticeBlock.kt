@@ -58,12 +58,12 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
 
         val clickedPos = context.clickedPos
         val clickedFace: Direction = context.clickedFace
-        val clickedFacingPos = clickedPos.relative(clickedFace.getOpposite())
+        val clickedFacingPos = clickedPos.relative(clickedFace.opposite)
         val clickedFacingState: BlockState = level.getBlockState(clickedFacingPos)
 
         if (context.player != null && !context.player!!.isCrouching && clickedFacingState.block is LatticeBlock) {
             val clickedFacingFace: Direction = clickedFacingState.getValue(FACING)
-            if (clickedFacingFace !== clickedFace && clickedFacingFace.getOpposite() !== clickedFace) facing =
+            if (clickedFacingFace !== clickedFace && clickedFacingFace.opposite !== clickedFace) facing =
                 clickedFacingFace
         }
         val bottom = clickedFace === Direction.DOWN || clickedFace === Direction.UP
@@ -89,12 +89,12 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
     override fun use(
         state: BlockState,
         world: Level,
-        pos: BlockPos?,
-        player: Player?,
-        hand: InteractionHand?,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
         hit: BlockHitResult
-    ): InteractionResult {
-        if (!world.isClientSide && player!!.getItemInHand(hand).getItem() is AxeItem) {
+    ): InteractionResult? {
+        if (!world.isClientSide && player!!.getItemInHand(hand).item is AxeItem) {
             val newState = state.setValue(SUPPORT, !state.getValue(SUPPORT))
             val updateState = getConnection(newState, world, pos!!)
             world.setBlock(pos, updateState, 3)
@@ -110,7 +110,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         val hitDirection: Direction = hit.direction
         if (age > 0 && stack.item === Items.SHEARS) {
             stack.hurtAndBreak(1, player,
-                Consumer { player2: LivingEntity -> player2.broadcastBreakEvent(player.getUsedItemHand()) })
+                Consumer { player2: LivingEntity -> player2.broadcastBreakEvent(player.usedItemHand) })
             if (age > 2) {
                 dropGrapes(world, state, pos, hitDirection)
             }
@@ -120,14 +120,14 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
             return InteractionResult.SUCCESS
         } else if (stack.item is GrapeBushSeedItem && (stack.item as GrapeBushSeedItem).type.isLattice && age == 0) {
             world.setBlock(pos, withAge(state, 1, (stack.item as GrapeBushSeedItem).type), 3)
-            if (!player.isCreative()) {
+            if (!player.isCreative) {
                 stack.shrink(1)
             }
             world.playSound(player, pos, PLACE_SOUND_EVENT, SoundSource.AMBIENT, 1.0f, 1.0f)
             return InteractionResult.SUCCESS
         } else if (age > 2) {
             stack.hurtAndBreak(1, player,
-                Consumer { player2: LivingEntity -> player2.broadcastBreakEvent(player.getUsedItemHand()) })
+                Consumer { player2: LivingEntity -> player2.broadcastBreakEvent(player.usedItemHand) })
             dropGrapes(world, state, pos, hitDirection)
             world.setBlock(pos, state.setValue(AGE, 1), 3)
             world.playSound(player, pos, BREAK_SOUND_EVENT, SoundSource.AMBIENT, 1.0f, 1.0f)
@@ -194,13 +194,13 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
     fun getConnection(state: BlockState, level: LevelAccessor, currentPos: BlockPos): BlockState {
         val facing: Direction = state.getValue(FACING)
 
-        val stateL = level.getBlockState(currentPos.relative(facing.getClockWise()))
-        val stateR = level.getBlockState(currentPos.relative(facing.getCounterClockWise()))
+        val stateL = level.getBlockState(currentPos.relative(facing.clockWise))
+        val stateR = level.getBlockState(currentPos.relative(facing.counterClockWise))
 
         val sideL =
-            (stateL.block is LatticeBlock && (stateL.getValue(FACING) == facing || stateL.getValue(FACING) == facing.getClockWise()))
+            (stateL.block is LatticeBlock && (stateL.getValue(FACING) == facing || stateL.getValue(FACING) == facing.clockWise))
         val sideR =
-            (stateR.block is LatticeBlock && (stateR.getValue(FACING) == facing || stateR.getValue(FACING) == facing.getCounterClockWise()))
+            (stateR.block is LatticeBlock && (stateR.getValue(FACING) == facing || stateR.getValue(FACING) == facing.counterClockWise))
         val type: GeneralUtil.LineConnectingType = if (sideL && sideR) GeneralUtil.LineConnectingType.MIDDLE
         else (if (sideR) GeneralUtil.LineConnectingType.LEFT
         else (if (sideL) GeneralUtil.LineConnectingType.RIGHT
@@ -224,7 +224,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         return state.rotate(mirror.getRotation(state.getValue(FACING)))
     }
 
-    override fun getPolymerBlock(p0: BlockState?): Block = Blocks.LADDER
+    override fun getPolymerBlock(p0: BlockState?): Block = Blocks.OAK_STAIRS
 
     companion object {
         val SUPPORT: BooleanProperty = BooleanProperty.create("support")

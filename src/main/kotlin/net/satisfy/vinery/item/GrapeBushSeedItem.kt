@@ -9,6 +9,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.satisfy.vinery.util.GrapeType
 
-class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeType) : ItemNameBlockItem(block, settings), PolymerItem {
+class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeType) : ItemNameBlockItem(block!!, settings!!), PolymerItem {
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.WHEAT_SEEDS
 }

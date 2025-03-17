@@ -50,7 +50,7 @@ private constructor(
         this.bottle = bottle
     }
 
-    override fun compareTo(grapeType: GrapeType): Int {
+    override fun compareTo(other: GrapeType): Int {
         return 0
     }
 
@@ -58,9 +58,9 @@ private constructor(
         return Objects.hash(id)
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o !is GrapeType) return false
-        return id == o.id
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GrapeType) return false
+        return id == other.id
     }
 }
