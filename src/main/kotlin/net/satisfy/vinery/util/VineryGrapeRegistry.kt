@@ -17,6 +17,7 @@ import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.item.GrapeItem
 import net.satisfy.vinery.item.GrapejuiceBottleItem
 import net.satisfy.vinery.item.VineryItem
+import java.util.function.Supplier
 
 
 object VineryGrapeRegistry {
@@ -202,6 +203,7 @@ object VineryGrapeRegistry {
                 val grapeName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape" else "${variant.id.split("_")[0]}_grapes_${variant.id.split("_")[1]}"
                 val grape = registerGrapes(grapeName, GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds))
                 val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "${variant.id}_grapejuice"), GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem())))
+                grapeType.setItems({ grape }, { seeds }, { juice })
                 put(variant, GrapeSet(grapeType, bush, seeds, grape, juice))
             }
         }

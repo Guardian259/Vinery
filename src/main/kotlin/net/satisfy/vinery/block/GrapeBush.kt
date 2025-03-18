@@ -3,6 +3,7 @@ package net.satisfy.vinery.block
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
@@ -28,6 +29,8 @@ import net.minecraft.world.level.pathfinder.PathComputationType
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
+import net.satisfy.vinery.Vinery
+import net.satisfy.vinery.Vinery.Companion.config
 import net.satisfy.vinery.util.GrapeType
 import kotlin.math.min
 
@@ -51,13 +54,13 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         hand: InteractionHand,
         hit: BlockHitResult
     ): InteractionResult {
-        val i: Int = state.getValue<Int>(AGE)
+        val i: Int = state.getValue(AGE)
         val bl = i == 3
         if (!bl && player.getItemInHand(hand).`is`(Items.BONE_MEAL)) {
             return InteractionResult.PASS
         } else if (i > 1) {
             val x = world.random.nextInt(2)
-            Block.popResource(world, pos, ItemStack(grapeType.item, x + (if (bl) 1 else 0)))
+            Block.popResource(world, pos, ItemStack(getType().getFruit(), x + (if (bl) 1 else 0)))
             world.playSound(
                 null,
                 pos,
@@ -66,7 +69,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
                 1.0f,
                 0.8f + world.random.nextFloat() * 0.4f
             )
-            world.setBlock(pos, state.setValue<Int, Int>(AGE, 1), 2)
+            world.setBlock(pos, state.setValue(AGE, 1), 2)
             return InteractionResult.sidedSuccess(world.isClientSide)
         } else {
             return super.use(state, world, pos, player, hand, hit)
@@ -75,10 +78,10 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
 
     
     override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
-        val age: Int = state.getValue<Int>(AGE)
-        val growthChance: Double = 0.5; //TODO: Reintegrate into Config
+        val age: Int = state.getValue(AGE)
+        val growthChance: Double = config!!.getOrDefault("grapeGrowthChance", 0.5)
         if (age < 3 && random.nextDouble() < growthChance && canGrowPlace(world, pos, state)) {
-            val newState: BlockState = state.setValue<Int, Int>(AGE, age + 1)
+            val newState: BlockState = state.setValue(AGE, age + 1)
             world.setBlock(pos, newState, 2)
             world.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(newState))
         }
@@ -133,7 +136,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         world.setBlock(pos, state.setValue<Int, Int>(AGE, i), 2)
     }
 
-    protected override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(AGE)
     }
 
@@ -176,10 +179,10 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
             return false
         }
     }
-//    VineryObjectRegistry.grapeSets[VineryObjectRegistry.GrapeVariant.valueOf(this.grapeType.descriptionId)]?.bush
-//    fun getPickStack(world: LevelReader?, pos: BlockPos?, state: BlockState?): ItemStack = ItemStack(ModItems.BLACKCURRANTS)
 
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.SWEET_BERRY_BUSH
+
+    override fun getPolymerBlockState(state: BlockState?): BlockState = Blocks.SWEET_BERRY_BUSH.defaultBlockState().setValue(AGE, state!!.getValue(AGE))
 
     companion object {
         val AGE: IntegerProperty = BlockStateProperties.AGE_3
