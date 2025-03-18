@@ -25,9 +25,10 @@ object VineryGrapeRegistry {
     val GRAPE_TYPES: MutableSet<GrapeType> = HashSet()
 
     /** Base wine bottle item, used for grape juice generation */
-    val WINE_BOTTLE = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties()))
+    val WINE_BOTTLE = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties(), "wine_bottle"))
     val FERMENTATION_BARREL = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
 
+    //TODO:Rework this into a data-driven system & streamline the Item registration process
     /**
      * Represents a grape variant with a flexible lineage and optional prefix/suffix.
      *
@@ -199,10 +200,11 @@ object VineryGrapeRegistry {
                 val bushName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape_bush" else "${variant.id.split("_")[0]}_grape_bush_${variant.id.split("_")[1]}"
                 val bush = if (variant.needsLattice) registerGrapeVine(bushName, bushProperties, grapeType) else  registerGrapeBush(bushName, bushProperties, grapeType)
                 val seedsName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape_seeds" else "${variant.id.split("_")[0]}_grape_seeds_${variant.id.split("_")[1]}"
-                val seeds = registerGrapeSeeds(seedsName, GrapeBushSeedItem(bush, Item.Properties(), grapeType))
+                val seeds = registerGrapeSeeds(seedsName, GrapeBushSeedItem(bush, Item.Properties(), grapeType, seedsName))
                 val grapeName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape" else "${variant.id.split("_")[0]}_grapes_${variant.id.split("_")[1]}"
-                val grape = registerGrapes(grapeName, GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds))
-                val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "${variant.id}_grapejuice"), GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem())))
+                val grape = registerGrapes(grapeName, GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds, grapeName))
+                val grapeJuice = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grapejuice" else "${variant.id.split("_")[1]}_${variant.id.split("_")[0]}_grapejuice"
+                val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, grapeJuice), GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem()), grapeJuice))
                 grapeType.setItems({ grape }, { seeds }, { juice })
                 put(variant, GrapeSet(grapeType, bush, seeds, grape, juice))
             }
@@ -217,6 +219,7 @@ object VineryGrapeRegistry {
     val JUNGLE_RED = grapeSets[GrapeVariant.JUNGLE_RED]!!
     val JUNGLE_WHITE = grapeSets[GrapeVariant.JUNGLE_WHITE]!!
 
+    //TODO:Will currently break with the fixed grapeSets system which sends the element name to the classes. determine if this should be removed or reworked
     /**
      * Registers a custom grape variant and its associated items in the grape sets.
      *
@@ -225,29 +228,29 @@ object VineryGrapeRegistry {
      *
      * @param variant The custom grape variant to register.
      */
-    fun registerCustomVariant(variant: GrapeVariant.CustomVariant) {
-        val grapeType = registerGrapeType(variant.id, variant.needsLattice)
-        GRAPE_TYPES.add(grapeType)
-
-        val bushProperties = BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH)
-        val bush = if (variant.needsLattice) {
-            registerGrapeVine("${variant.id}_grape_bush", bushProperties, grapeType)
-        } else {
-            registerGrapeBush("${variant.id}_grape_bush", bushProperties, grapeType)
-        }
-
-        val seeds = registerGrapeSeeds("${variant.id}_grape_seeds",
-            GrapeBushSeedItem(bush, Item.Properties(), grapeType))
-
-        val grape = registerGrapes("${variant.id}_grape",
-            GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds))
-
-        val juice = register(BuiltInRegistries.ITEM,
-            ResourceLocation(MODID, "${variant.id}_grapejuice"),
-            GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem())))
-
-        grapeSets[variant] = GrapeSet(grapeType, bush, seeds, grape, juice)
-    }
+//    fun registerCustomVariant(variant: GrapeVariant.CustomVariant) {
+//        val grapeType = registerGrapeType(variant.id, variant.needsLattice)
+//        GRAPE_TYPES.add(grapeType)
+//
+//        val bushProperties = BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH)
+//        val bush = if (variant.needsLattice) {
+//            registerGrapeVine("${variant.id}_grape_bush", bushProperties, grapeType)
+//        } else {
+//            registerGrapeBush("${variant.id}_grape_bush", bushProperties, grapeType)
+//        }
+//
+//        val seeds = registerGrapeSeeds("${variant.id}_grape_seeds",
+//            GrapeBushSeedItem(bush, Item.Properties(), grapeType))
+//
+//        val grape = registerGrapes("${variant.id}_grape",
+//            GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds))
+//
+//        val juice = register(BuiltInRegistries.ITEM,
+//            ResourceLocation(MODID, "${variant.id}_grapejuice"),
+//            GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem())))
+//
+//        grapeSets[variant] = GrapeSet(grapeType, bush, seeds, grape, juice)
+//    }
 
     // Registration functions
     private fun registerGrapes(name: String, item: Item) =

@@ -1,7 +1,10 @@
 package net.satisfy.vinery.item
 
 import eu.pb4.polymer.core.api.item.PolymerItem
+import eu.pb4.polymer.resourcepack.api.PolymerModelData
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils
 import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
@@ -14,10 +17,14 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
+import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.util.VineryGrapeRegistry
 
 
-class GrapejuiceBottleItem(properties: Properties?) : Item(properties!!), PolymerItem {
+class GrapejuiceBottleItem(properties: Properties?, juiceModelName: String) : Item(properties!!), PolymerItem {
+
+    private val juiceModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.SWEET_BERRIES, ResourceLocation(MODID, "item/$juiceModelName"))
+
     override fun finishUsingItem(itemStack: ItemStack, level: Level, livingEntity: LivingEntity): ItemStack {
         if (livingEntity is ServerPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger(livingEntity, itemStack)
@@ -51,4 +58,6 @@ class GrapejuiceBottleItem(properties: Properties?) : Item(properties!!), Polyme
     override fun use(level: Level, player: Player, interactionHand: InteractionHand): InteractionResultHolder<ItemStack>? = ItemUtils.startUsingInstantly(level, player, interactionHand)
 
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.GLASS_BOTTLE
+
+    override fun getPolymerCustomModelData(itemStack: ItemStack?, player: ServerPlayer?): Int = juiceModel.value()
 }

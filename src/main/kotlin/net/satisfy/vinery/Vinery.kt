@@ -17,11 +17,11 @@ class Vinery : ModInitializer {
 
     private fun modInit() {
         log.info("Vinery Initializing...")
-        PolymerResourcePackUtils.addModAssets(MODID)
         config = SimpleConfig.of("vinery").provider { filename: String -> this.getDefaultConfig(filename) }
             .request()
         VineryGrapeRegistry
         VineryObjectRegistry()
+        PolymerResourcePackUtils.addModAssets(MODID)
         log.info("Vinery Initializing Complete, Success!")
     }
 
