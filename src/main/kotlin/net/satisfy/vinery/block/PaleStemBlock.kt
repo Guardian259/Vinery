@@ -39,16 +39,15 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
 
     @NotNull
     override fun getShape(
-        state: BlockState?,
-        world: BlockGetter?,
-        pos: BlockPos?,
-        context: CollisionContext?
+        state: BlockState,
+        world: BlockGetter,
+        pos: BlockPos,
+        context: CollisionContext
     ): VoxelShape {
         return PALE_SHAPE
     }
 
     @Nullable
-    @Suppress("unused")
     override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
         val blockState: BlockState = defaultBlockState()
         val world: Level = ctx.level
@@ -67,9 +66,9 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
         itemStack: ItemStack
     ) {
         if (livingEntity is Player) {
-            if ((livingEntity.isCreative || itemStack.getCount() >= 2) && level.getBlockState(
+            if ((livingEntity.isCreative || itemStack.count >= 2) && level.getBlockState(
                     blockPos.below()
-                ).block !== this && blockPos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(
+                ).block !== this && blockPos.y < level.maxBuildHeight - 1 && level.getBlockState(
                     blockPos.above()
                 ).canBeReplaced()
             ) {
@@ -94,19 +93,19 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
         }
 
         val age: Int = state.getValue(AGE)
-        if (age > 0 && player!!.getItemInHand(hand).getItem() === Items.SHEARS) {
+        if (age > 0 && player.getItemInHand(hand).item === Items.SHEARS) {
             if (age > 2) {
-                dropGrapes(world, state, pos, hit.getDirection())
+                dropGrapes(world, state, pos, hit.direction)
             }
-            dropGrapeSeeds(world, state, pos, hit.getDirection())
+            dropGrapeSeeds(world, state, pos, hit.direction)
             world.setBlock(pos, withAge(state, max(0.0, (age - 1).toDouble()).toInt(), state.getValue(GRAPE)), 3)
             world.playSound(player, pos, SoundEvents.SWEET_BERRY_BUSH_BREAK, SoundSource.AMBIENT, 1.0f, 1.0f)
             return InteractionResult.sidedSuccess(world.isClientSide)
         }
 
 
-        val stack: ItemStack = player!!.getItemInHand(hand)
-        if (stack.item is GrapeBushSeedItem && hasTrunk(world, pos!!)) {
+        val stack: ItemStack = player.getItemInHand(hand)
+        if (stack.item is GrapeBushSeedItem && hasTrunk(world, pos)) {
             val seed = (stack.item as GrapeBushSeedItem)
             if (age == 0) {
                 if (!seed.type.isLattice) {
@@ -123,7 +122,7 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
         return super.use(state, world, pos, player, hand, hit)
     }
 
-    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos?, random: RandomSource?) {
+    override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         if (!state.canSurvive(world, pos)) {
             if (state.getValue(AGE) > 0) {
                 dropGrapeSeeds(world, state, pos, null)
@@ -135,10 +134,10 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
         }
     }
 
-    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos?, random: RandomSource?) {
+    override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val rand: Random = Random()
         if (rand.nextInt(100) >= 98) return
-        if (!isMature(state) && hasTrunk(world, pos!!) && state.getValue(AGE) > 0) {
+        if (!isMature(state) && hasTrunk(world, pos) && state.getValue(AGE) > 0) {
             var i: Int = 0
             if (world.getRawBrightness(pos, 0) >= 9 && (state.getValue(AGE).also { i = it }) < 4) {
                 world.setBlock(pos, this.withAge(state, i + 1, state.getValue(GRAPE)), Block.UPDATE_CLIENTS)
@@ -150,18 +149,18 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
 
     override fun canSurvive(state: BlockState?, world: LevelReader, pos: BlockPos): Boolean {
         return world.getBlockState(pos.below()).isRedstoneConductor(world, pos) || world.getBlockState(pos.below())
-            .getBlock() === this
+            .block === this
     }
 
     @NotNull
     override fun updateShape(
         state: BlockState,
-        direction: Direction?,
-        neighborState: BlockState?,
+        direction: Direction,
+        neighborState: BlockState,
         world: LevelAccessor,
-        pos: BlockPos?,
-        neighborPos: BlockPos?
-    ): BlockState {
+        pos: BlockPos,
+        neighborPos: BlockPos
+    ): BlockState? {
         if (!state.canSurvive(world, pos)) {
             world.scheduleTick(pos, this, 1)
         }

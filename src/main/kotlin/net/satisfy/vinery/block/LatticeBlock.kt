@@ -74,8 +74,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         return state
     }
 
-
-    @Suppress("deprecation")
+    
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         if (java.lang.Boolean.TRUE == state.getValue(BOTTOM)) return FLOOR
         return when (state.getValue(FACING)) {
@@ -86,6 +85,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         }
     }
 
+    
     override fun use(
         state: BlockState,
         world: Level,
@@ -94,13 +94,13 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         hand: InteractionHand,
         hit: BlockHitResult
     ): InteractionResult? {
-        if (!world.isClientSide && player!!.getItemInHand(hand).item is AxeItem) {
+        if (!world.isClientSide && player.getItemInHand(hand).item is AxeItem) {
             val newState = state.setValue(SUPPORT, !state.getValue(SUPPORT))
-            val updateState = getConnection(newState, world, pos!!)
+            val updateState = getConnection(newState, world, pos)
             world.setBlock(pos, updateState, 3)
             return InteractionResult.SUCCESS
         }
-        val stack: ItemStack = player!!.getItemInHand(hand)
+        val stack: ItemStack = player.getItemInHand(hand)
         val age = state.getValue(AGE)
 
         if (hand == InteractionHand.OFF_HAND) {
@@ -137,7 +137,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         return super.use(state, world, pos, player, hand, hit)
     }
 
-    @Suppress("deprecation")
+
     override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val rand: Random = Random()
         if (rand.nextInt(100) >= 98 || isMature(state)) return
@@ -147,7 +147,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         super.randomTick(state, world, pos, random)
     }
 
-    @Suppress("deprecation")
+
     override fun tick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         if (!state.canSurvive(world, pos)) {
             if (state.getValue(AGE) > 0) {
@@ -167,7 +167,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         return (!isMature(state) && age > 0 && age < 4)
     }
 
-    @Suppress("deprecation")
+    
     override fun updateShape(
         state: BlockState,
         direction: Direction?,
@@ -214,12 +214,12 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         builder.add(FACING, TYPE, SUPPORT, BOTTOM)
     }
 
-    @Suppress("deprecation")
+
     override fun rotate(state: BlockState, rotation: Rotation): BlockState {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)))
     }
 
-    @Suppress("deprecation")
+
     override fun mirror(state: BlockState, mirror: Mirror): BlockState {
         return state.rotate(mirror.getRotation(state.getValue(FACING)))
     }
@@ -230,11 +230,11 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         val SUPPORT: BooleanProperty = BooleanProperty.create("support")
         val BOTTOM: BooleanProperty = BooleanProperty.create("bottom")
 
-        protected val EAST: VoxelShape = box(0.0, 0.0, 0.0, 2.0, 16.0, 16.0)
-        protected val WEST: VoxelShape = box(14.0, 0.0, 0.0, 16.0, 16.0, 16.0)
-        protected val SOUTH: VoxelShape = box(0.0, 0.0, 0.01, 16.0, 16.0, 2.0)
-        protected val NORTH: VoxelShape = box(0.0, 0.0, 14.0, 16.0, 16.0, 16.0)
-        protected val FLOOR: VoxelShape = box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0)
+        private val EAST: VoxelShape = box(0.0, 0.0, 0.0, 2.0, 16.0, 16.0)
+        private val WEST: VoxelShape = box(14.0, 0.0, 0.0, 16.0, 16.0, 16.0)
+        private val SOUTH: VoxelShape = box(0.0, 0.0, 0.01, 16.0, 16.0, 2.0)
+        private val NORTH: VoxelShape = box(0.0, 0.0, 14.0, 16.0, 16.0, 16.0)
+        private val FLOOR: VoxelShape = box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0)
 
 
         val FACING: DirectionProperty = BlockStateProperties.HORIZONTAL_FACING

@@ -33,6 +33,7 @@ import kotlin.math.min
 
 open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
 
+    
     override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         return SHAPE
     }
@@ -41,6 +42,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         return ItemStack(getType().getSeeds())
     }
 
+    
     override fun use(
         state: BlockState,
         world: Level,
@@ -55,7 +57,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
             return InteractionResult.PASS
         } else if (i > 1) {
             val x = world.random.nextInt(2)
-            Block.popResource(world, pos, ItemStack(grapeType.getItem(), x + (if (bl) 1 else 0)))
+            Block.popResource(world, pos, ItemStack(grapeType.item, x + (if (bl) 1 else 0)))
             world.playSound(
                 null,
                 pos,
@@ -71,6 +73,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         }
     }
 
+    
     override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val age: Int = state.getValue<Int>(AGE)
         val growthChance: Double = 0.5; //TODO: Reintegrate into Config
@@ -102,6 +105,9 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         return world.getRawBrightness(blockPos, 0) > 9
     }
 
+    @Deprecated("Deprecated in Java",
+        ReplaceWith("canGrowPlace(world, blockPos, blockState) && this.mayPlaceOn(world.getBlockState(blockPos.below()), world, blockPos)")
+    )
     override fun canSurvive(blockState: BlockState, world: LevelReader, blockPos: BlockPos): Boolean {
         return canGrowPlace(world, blockPos, blockState) && this.mayPlaceOn(
             world.getBlockState(blockPos.below()),
@@ -114,11 +120,11 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         return floor.isSolidRender(world, pos)
     }
 
-    fun getType(): GrapeType {
+    private fun getType(): GrapeType {
         return this.type
     }
 
-    val grapeType: ItemStack
+    private val grapeType: ItemStack
         get() = ItemStack(getType().getFruit())
 
 
@@ -153,13 +159,14 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
                 }
 
                 pos = var2.next()
-            } while (!(world.getBlockState(pos).getBlock() === Blocks.PODZOL || world.getBlockState(pos)
-                    .getBlock() === Blocks.COARSE_DIRT || world.getBlockState(pos).getBlock() === Blocks.GRASS_BLOCK)
+            } while (!(world.getBlockState(pos).block === Blocks.PODZOL || world.getBlockState(pos)
+                    .block === Blocks.COARSE_DIRT || world.getBlockState(pos).block === Blocks.GRASS_BLOCK)
             )
 
             return true
         }
 
+        @Deprecated("Deprecated in Java", ReplaceWith("false"))
         override fun isPathfindable(
             arg: BlockState,
             arg2: BlockGetter,

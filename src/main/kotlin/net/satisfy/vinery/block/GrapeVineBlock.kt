@@ -28,8 +28,7 @@ import net.satisfy.vinery.util.GrapeType
 import net.satisfy.vinery.util.VineryGrapeRegistry
 import kotlin.math.min
 
-@Suppress("deprecation")
-class GrapeVineBlock(settings: Properties?, val type: GrapeType) : VineBlock(settings), BonemealableBlock, PolymerBlock {
+class GrapeVineBlock(settings: Properties?, val type: GrapeType) : VineBlock(settings!!), BonemealableBlock, PolymerBlock {
     override fun use(
         state: BlockState,
         world: Level,

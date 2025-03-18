@@ -57,6 +57,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
         else GeneralUtil.popResourceFromFace(world!!, pos!!, direction, stack)
     }
 
+    @Deprecated("Deprecated in Java")
     @NotNull
     override fun use(
         state: BlockState,
@@ -68,7 +69,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
     ): InteractionResult? {
         val age: Int = state.getValue(AGE)
         if (age > 3) {
-            dropGrapes(world, state, pos, hit.getDirection())
+            dropGrapes(world, state, pos, hit.direction)
             world.setBlock(pos, state.setValue(AGE, 2), 2)
             return InteractionResult.sidedSuccess(world.isClientSide)
         } else {
@@ -98,7 +99,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
 
     init { this.registerDefaultState(this.defaultBlockState().setValue(GRAPE, VineryGrapeRegistry.NONE).setValue(AGE, 0)) }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) { builder.add(AGE, GRAPE) } //TODO: SYSTEM IS ERRORING OUT HERE
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) { builder.add(AGE, GRAPE) }
 
     fun isMature(state: BlockState): Boolean {
         return state.getValue(AGE) >= 4
