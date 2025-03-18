@@ -5,7 +5,6 @@ import net.darktree.simpleconfig.SimpleConfig
 import net.fabricmc.api.ModInitializer
 import net.satisfy.vinery.util.VineryGrapeRegistry
 import net.satisfy.vinery.util.VineryObjectRegistry
-//import net.satisfy.vinery.util.VineryRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
