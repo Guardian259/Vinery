@@ -1,15 +1,22 @@
 package net.satisfy.vinery.util
 
+import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.stats.Stats
 import net.minecraft.util.Mth
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.properties.EnumProperty
+
 
 object GeneralUtil {
     val LINE_CONNECTING_TYPE: EnumProperty<LineConnectingType> = EnumProperty.create(
@@ -72,6 +79,39 @@ object GeneralUtil {
         if (!level.isClientSide && !itemStack.isEmpty && level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
             itemEntity.setDefaultPickUpDelay()
             level.addFreshEntity(itemEntity)
+        }
+    }
+
+    /**
+     * Converts a used item stack into a return item after use by a living entity.
+     * @param entity The entity using the item.
+     * @param used The used item stack.
+     * @param returnItem The item to return.
+     * @param usedItem The item type used for stats.
+     * @return The resulting [ItemStack].
+     */
+    fun convertStackAfterFinishUsing(
+        entity: LivingEntity,
+        used: ItemStack,
+        returnItem: Item?,
+        usedItem: Item?
+    ): ItemStack {
+        if (entity is ServerPlayer) {
+            CriteriaTriggers.CONSUME_ITEM.trigger(entity, used)
+            entity.awardStat(Stats.ITEM_USED.get(usedItem!!))
+        }
+
+        if (used.isEmpty) {
+            return ItemStack(returnItem!!)
+        } else {
+            if (entity is Player) {
+                if (!entity.abilities.instabuild) {
+                    val itemStack2 = ItemStack(returnItem!!)
+                    if (!entity.inventory.add(itemStack2)) entity.drop(itemStack2, false)
+                }
+            }
+
+            return used
         }
     }
 

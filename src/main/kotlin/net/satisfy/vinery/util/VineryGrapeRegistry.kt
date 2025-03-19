@@ -17,7 +17,6 @@ import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.item.GrapeItem
 import net.satisfy.vinery.item.GrapejuiceBottleItem
 import net.satisfy.vinery.item.VineryItem
-import java.util.function.Supplier
 
 
 object VineryGrapeRegistry {
@@ -25,8 +24,8 @@ object VineryGrapeRegistry {
     val GRAPE_TYPES: MutableSet<GrapeType> = HashSet()
 
     /** Base wine bottle item, used for grape juice generation */
-    val WINE_BOTTLE = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties(), "wine_bottle"))
-    val FERMENTATION_BARREL = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
+    val WINE_BOTTLE: VineryItem = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties(), "wine_bottle"))
+    val FERMENTATION_BARREL: FermentationBarrelBlock = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
 
     //TODO:Rework this into a data-driven system & streamline the Item registration process
     /**

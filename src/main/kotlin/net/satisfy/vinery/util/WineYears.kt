@@ -14,8 +14,8 @@ object WineYears {
     private const val MAX_LEVEL = 5             // Max effect level
     private const val START_DURATION = 1800     // Base effect duration (ticks)
     private const val DURATION_PER_YEAR = 200   // Duration increase per year (ticks)
-    private const val DAYS_PER_YEAR = 24        // Minecraft days per wine year
-    private const val YEARS_PER_EFFECT_LEVEL = 6 // Years per effect level increase
+    const val DAYS_PER_YEAR = 24        // Minecraft days per wine year
+    const val YEARS_PER_EFFECT_LEVEL = 6 // Years per effect level increase
     private const val MAX_DURATION = 15000      // Max effect duration (ticks)
 
 

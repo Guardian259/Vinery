@@ -15,7 +15,7 @@ import net.satisfy.vinery.util.GrapeType
 
 class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeType, seedsModelName: String) : ItemNameBlockItem(block!!, settings!!), PolymerItem {
 
-    private val seedsModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.SWEET_BERRIES, ResourceLocation(MODID, "item/$seedsModelName"))
+    private val seedsModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.WHEAT_SEEDS, ResourceLocation(MODID, "item/$seedsModelName"))
 
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.WHEAT_SEEDS
 

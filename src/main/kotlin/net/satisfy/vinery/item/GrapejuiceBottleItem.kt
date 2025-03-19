@@ -23,7 +23,7 @@ import net.satisfy.vinery.util.VineryGrapeRegistry
 
 class GrapejuiceBottleItem(properties: Properties?, juiceModelName: String) : Item(properties!!), PolymerItem {
 
-    private val juiceModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.SWEET_BERRIES, ResourceLocation(MODID, "item/$juiceModelName"))
+    private val juiceModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.GLASS_BOTTLE, ResourceLocation(MODID, "item/$juiceModelName"))
 
     override fun finishUsingItem(itemStack: ItemStack, level: Level, livingEntity: LivingEntity): ItemStack {
         if (livingEntity is ServerPlayer) {
