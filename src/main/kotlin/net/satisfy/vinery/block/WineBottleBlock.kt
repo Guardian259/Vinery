@@ -1,6 +1,7 @@
 package net.satisfy.vinery.block
 
 import com.mojang.datafixers.util.Pair
+import eu.pb4.polymer.core.api.block.PolymerBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
@@ -10,13 +11,14 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelAccessor
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
@@ -26,12 +28,12 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import net.satisfy.vinery.item.DrinkBlockItem
 
 @Suppress("deprecation")
-class WineBottleBlock(settings: Item.Properties?, private val maxCount: Int) /*: StorageBlock(settings)*/ {
+class WineBottleBlock(settings: Properties?, private val maxCount: Int): Block(settings!!), /*StorageBlock(settings)*/ PolymerBlock {
 //    init {
 //        this.registerDefaultState(this.defaultBlockState().setValue(FAKE_MODEL, true))
 //    }
 
-    fun use(
+    override fun use(
         state: BlockState?,
         world: Level,
         pos: BlockPos?,
@@ -97,7 +99,7 @@ class WineBottleBlock(settings: Item.Properties?, private val maxCount: Int) /*:
     }
 
 
-    fun getShape(state: BlockState?, world: BlockGetter?, pos: BlockPos?, context: CollisionContext?): VoxelShape {
+    override fun getShape(state: BlockState?, world: BlockGetter?, pos: BlockPos?, context: CollisionContext?): VoxelShape {
         return SHAPE
     }
 
@@ -149,6 +151,8 @@ class WineBottleBlock(settings: Item.Properties?, private val maxCount: Int) /*:
     fun unAllowedDirections(): Array<Direction?> {
         return arrayOfNulls(0)
     }
+
+    override fun getPolymerBlock(p0: BlockState?): Block = Blocks.PLAYER_HEAD
 
     companion object {
         private val SHAPE: VoxelShape = Shapes.box(0.125, 0.0, 0.125, 0.875, 0.875, 0.875)

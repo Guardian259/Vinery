@@ -1,5 +1,7 @@
 package net.satisfy.vinery.util
 
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import net.minecraft.core.Registry.register
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
@@ -11,13 +13,20 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.satisfy.vinery.Vinery.Companion.MODID
+import net.satisfy.vinery.Vinery.Companion.log
 import net.satisfy.vinery.block.LatticeBlock
 import net.satisfy.vinery.block.PaleStemBlock
+import net.satisfy.vinery.block.WineBottleBlock
 import net.satisfy.vinery.item.DrinkBlockItem
+import java.io.File
 import java.util.function.Supplier
 
 
 class VineryObjectRegistry {
+
+    // Common properties for all wine bottles
+    private val wineSettings = BlockBehaviour.Properties.copy(Blocks.GLASS).noOcclusion().instabreak()
+
     /** Grapevine stem block with wood-like properties. */
     val GRAPEVINE_STEM = register(
         BuiltInRegistries.BLOCK,
@@ -25,211 +34,193 @@ class VineryObjectRegistry {
         PaleStemBlock(BlockBehaviour.Properties.of().strength(2.0f).randomTicks().sound(SoundType.WOOD).noOcclusion())
     )
 
-    //TODO: THESE MAY BE REMOVED
+    /**
+     * Defines the properties of a wine bottle block, matching the structure expected in the `wines.json` file.
+     *
+     * @property name The unique identifier for the wine (e.g., "red_wine").
+     * @property maxCount The potency or maximum stack count of the wine, defaults to 3 if not specified.
+     */
+    data class WineBLockDefinition(
+        val name: String,
+        val maxCount: Int = 3 // Default maxCount if not specified in JSON
+    ) {
+        companion object {
+            /**
+             * Loads wine block definitions from a JSON file.
+             *
+             * The JSON file should contain an array of objects with `name` (required) and `maxCount` (optional) fields.
+             * Example:
+             * ```
+             * [
+             *   {"name": "red_wine", "maxCount": 3},
+             *   {"name": "chorus_wine"}
+             * ]
+             * ```
+             *
+             * @param filePath The filesystem path to the JSON file (e.g., "data/vinery/wines.json").
+             * @return A list of [WineBlockDefinition] instances parsed from the JSON.
+             * @throws IllegalStateException If the JSON file is not found at the specified path.
+             */
+            fun loadFromJson(filePath: String): List<WineBLockDefinition> {
+                val gson = Gson()
+                val file = File(filePath)
+                if (!file.exists()) {
+                    throw IllegalStateException("Wine definitions JSON file not found at $filePath")
+                }
+                val jsonString = file.readText()
+                val listType = object : TypeToken<List<WineBLockDefinition>>() {}.type
+                return gson.fromJson(jsonString, listType)
+            }
+        }
+    }
 
-    val CHORUS_WINE: String = "chorus_wine"
-    val CHERRY_WINE: String = "cherry_wine"
-    val MAGNETIC_WINE: String = "magnetic_wine"
-    val JO_SPECIAL_MIXTURE: String = "jo_special_mixture"
-    val CRISTEL_WINE: String = "cristel_wine"
-    val GLOWING_WINE: String = "glowing_wine"
-    val CREEPERS_CRUSH: String = "creepers_crush"
-    val MEAD: String = "mead"
-    val RED_WINE: String = "red_wine"
-    val JELLIE_WINE: String = "jellie_wine"
-    val STAL_WINE: String = "stal_wine"
-    val NOIR_WINE: String = "noir_wine"
-    val BOLVAR_WINE: String = "bolvar_wine"
-    val SOLARIS_WINE: String = "solaris_wine"
-    val EISWEIN: String = "eiswein"
-    val CHENET_WINE: String = "chenet_wine"
-    val KELP_CIDER: String = "kelp_cider"
-    val AEGIS_WINE: String = "aegis_wine"
-    val CLARK_WINE: String = "clark_wine"
-    val MELLOHI_WINE: String = "mellohi_wine"
-    val STRAD_WINE: String = "strad_wine"
-    val APPLE_CIDER: String = "apple_cider"
-    val APPLE_WINE: String = "apple_wine"
-    val LILITU_WINE: String = "lilitu_wine"
-    val BOTTLE_MOJANG_NOIR: String = "bottle_mojang_noir"
-    val VILLAGERS_FRIGHT: String = "villagers_fright"
 
+    /**
+     * Collection of wine types loaded from the JSON resource or fallback defaults.
+     * Attempts to load from "data/[MODID]/wines.json"; if that fails, uses a predefined fallback list.
+     */
+    private val wineTypes: List<WineBLockDefinition> = try {
+        WineBLockDefinition.loadFromJson("data/${MODID}/wines.json")
+            .also { log.info("Load wines.json from: data/${MODID}/wines.json...") }
+    } catch (e: Exception) {
+        log.info("Failed to load wines.json: ${e.message}. Using fallback defaults.")
+        listOf( // Fallback to avoid crashing
+            WineBLockDefinition("chorus_wine", 1),
+            WineBLockDefinition("cherry_wine"),
+            WineBLockDefinition("magnetic_wine", 1),
+            WineBLockDefinition("jo_special_mixture", 1),
+            WineBLockDefinition("cristel_wine", 1),
+            WineBLockDefinition("glowing_wine", 1),
+            WineBLockDefinition("creepers_crush", 1),
+            WineBLockDefinition("mead", 2),
+            WineBLockDefinition("red_wine"),
+            WineBLockDefinition("jellie_wine", 1),
+            WineBLockDefinition("stal_wine"),
+            WineBLockDefinition("noir_wine"),
+            WineBLockDefinition("bolvar_wine"),
+            WineBLockDefinition("solaris_wine"),
+            WineBLockDefinition("eiswein", 2),
+            WineBLockDefinition("chenet_wine", 2),
+            WineBLockDefinition("kelp_cider"),
+            WineBLockDefinition("aegis_wine", 2),
+            WineBLockDefinition("clark_wine"),
+            WineBLockDefinition("mellohi_wine", 2),
+            WineBLockDefinition("strad_wine", 2),
+            WineBLockDefinition("apple_cider", 2),
+            WineBLockDefinition("apple_wine"),
+            WineBLockDefinition("lilitu_wine", 1),
+            WineBLockDefinition("bottle_mojang_noir"),
+            WineBLockDefinition("villagers_fright")
+        )
+    }
 
-//    val APPLE_CIDER_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("apple_cider", APPLE_CIDER, { createWineSettings({ MobEffects.DAMAGE_BOOST }, 1600, 0) }, true)
-//
-//    val APPLE_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "apple_wine",
-//        APPLE_WINE,
-//        { createWineSettings({ MobEffects.DAMAGE_RESISTANCE }, 1600, 0) },
-//        true
-//    )
-//
-//    val MEAD_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("mead", MEAD, { createWineSettings({ MobEffects.DIG_SPEED }, 1600, 0) }, true)
-//
-//    val GLOWING_WINE_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("glowing_wine", GLOWING_WINE, { createWineSettings({ MobEffects.GLOWING }, 1600, 0) }, true)
-//
-//    val SOLARIS_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "solaris_wine",
-//        SOLARIS_WINE,
-//        { createWineSettings({ MobEffects.HEALTH_BOOST }, 1600, 0) },
-//        true
-//    )
-//
-//    val KELP_CIDER_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "kelp_cider",
-//        KELP_CIDER,
-//        { createWineSettings({ MobEffectRegistry.WATER_WALKER.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val EISWEIN_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "eiswein",
-//        EISWEIN,
-//        { createWineSettings({ MobEffectRegistry.FROSTY_ARMOR_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val AEGIS_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "aegis_wine",
-//        AEGIS_WINE,
-//        { createWineSettings({ MobEffectRegistry.ARMOR_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val VILLAGERS_FRIGHT_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "villagers_fright",
-//        VILLAGERS_FRIGHT,
-//        { createWineSettings({ MobEffects.BAD_OMEN }, 1600, 0) },
-//        true
-//    )
-//
-//    val CLARK_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "clark_wine",
-//        CLARK_WINE,
-//        { createWineSettings({ MobEffectRegistry.IMPROVED_JUMP_BOOST.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val JELLIE_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "jellie_wine",
-//        JELLIE_WINE,
-//        { createWineSettings({ MobEffectRegistry.JELLIE.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val NOIR_WINE_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("noir_wine", NOIR_WINE, { createWineSettings({ MobEffects.JUMP }, 1600, 0) }, true)
-//
-//    val drinkBlockSettings = createWineSettings({ MobEffects.SLOW_FALLING }, 1600, 0) };
-//    val RED_WINE_ITEM = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "grapevine_stem"), DrinkBlockItem(
-//        wineBlock.get(),
-//        drinkBlockSettings.get().properties,
-//        name,
-//        drinkBlockSettings.get().baseDuration,
-//        true
-//    ))
-//    val RED_WINE_ITEM: Item =
-//        registerWineItem("red_wine", RED_WINE, { createWineSettings({ MobEffects.SLOW_FALLING }, 1600, 0) }, true)
-//
-//    private fun registerWineItem(
-//        name: String,
-//        wineBlock: Supplier<Block>,
-//        wineSettings: Supplier<WineSettings>,
-//        scaleDurationWithAge: Boolean
-//    ): RegistrySupplier<Item> {
-//        return registerItem(name) {
-//            DrinkBlockItem(
-//                wineBlock.get(),
-//                wineSettings.get().properties,
-//                name,
-//                wineSettings.get().baseDuration,
-//                scaleDurationWithAge.toInt()
-//            )
-//        }
-//    }
+    /**
+     * Map of registered wine blocks, keyed by their [WineBlockDefinition.name] for easy access.
+     * Each wine is registered as a [WineBottleBlock] instance during initialization.
+     */
+    val registeredWines: Map<String, WineBottleBlock> = wineTypes.associate { wine ->
+        wine.name to registerWine(wine)
+    }
 
-    private fun createWineSettings(effect: Supplier<MobEffect>, duration: Int, strength: Int) = WineSettings(effect, duration, strength)
+    /**
+     * Registers a wine block with the Minecraft registry.
+     *
+     * @param wine The [WineBlockDefinition] containing the wine’s name and properties.
+     * @return The registered [WineBottleBlock] instance.
+     */
+    private fun registerWine(wine: WineBLockDefinition): WineBottleBlock {
+        return register(
+            BuiltInRegistries.BLOCK,
+            ResourceLocation(MODID, wine.name),
+            WineBottleBlock(wineSettings, wine.maxCount)
+        )
+    }
 
-//    val STRAD_WINE_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("strad_wine", STRAD_WINE, { createWineSettings({ MobEffects.NIGHT_VISION }, 1600, 0) }, true)
-//
-//    val CHERRY_WINE_ITEM: RegistrySupplier<Item> =
-//        registerWineItem("cherry_wine", CHERRY_WINE, { createWineSettings({ MobEffects.INVISIBILITY }, 1600, 0) }, true)
-//
-//    val CRISTEL_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "cristel_wine",
-//        CRISTEL_WINE,
-//        { createWineSettings({ MobEffects.WATER_BREATHING }, 1600, 0) },
-//        true
-//    )
-//
-//    val LILITU_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "lilitu_wine",
-//        LILITU_WINE,
-//        { createWineSettings({ MobEffectRegistry.PARTY_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val JO_SPECIAL_MIXTURE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "jo_special_mixture",
-//        JO_SPECIAL_MIXTURE,
-//        { createWineSettings({ MobEffectRegistry.CLIMBING_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val BOLVAR_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "bolvar_wine",
-//        BOLVAR_WINE,
-//        { createWineSettings({ MobEffectRegistry.LAVA_WALKER.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val MAGNETIC_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "magnetic_wine",
-//        MAGNETIC_WINE,
-//        { createWineSettings({ MobEffectRegistry.MAGNET.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val STAL_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "stal_wine",
-//        STAL_WINE,
-//        { createWineSettings({ MobEffectRegistry.HEALTH_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val CHENET_WINE_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "chenet_wine",
-//        CHENET_WINE,
-//        { createWineSettings({ MobEffectRegistry.CLIMBING_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val BOTTLE_MOJANG_NOIR_ITEM: RegistrySupplier<Item> = registerWineItem(
-//        "bottle_mojang_noir",
-//        BOTTLE_MOJANG_NOIR,
-//        { createWineSettings({ MobEffectRegistry.EXPERIENCE_EFFECT.get() }, 1600, 0) },
-//        true
-//    )
-//
-//    val CHORUS_WINE_ITEM: RegistrySupplier<Item> =
-//        registerFixedDurationWineItem("chorus_wine", CHORUS_WINE, 10, { MobEffectRegistry.TELEPORT.get() }, 0)
-//
-//    val CREEPERS_CRUSH_ITEM: RegistrySupplier<Item> = registerFixedDurationWineItem(
-//        "creepers_crush",
-//        CREEPERS_CRUSH,
-//        100,
-//        { MobEffectRegistry.CREEPER_EFFECT.get() },
-//        0
-//    )
-//
-//    val MELLOHI_WINE_ITEM: RegistrySupplier<Item> =
-//        registerFixedDurationWineItem("mellohi_wine", MELLOHI_WINE, 0, { MobEffects.HEAL }, 0)
+    //#=================================================================================================================
 
-    //TODO: THESE MAY BE REMOVED
+    /**
+     * Defines the properties of a wine item, including its effect and duration settings.
+     */
+    data class WineItemDefinition(
+        val name: String,
+        val wineBlock: Block, // Reference to the associated WineBottleBlock
+        val effect: Supplier<MobEffect?>,
+        val duration: Int = 1600, // Default duration for most wines
+        val strength: Int = 0, // Default strength
+        val scaleDurationWithAge: Boolean = true // Whether duration scales with age
+    )
+
+    // List of all wine item definitions to register
+    private val wineItemDefinitions = listOf(
+        WineItemDefinition("apple_cider", registeredWines["apple_cider"]!!, { MobEffects.DAMAGE_BOOST }, 1600, 0, true),
+        WineItemDefinition("apple_wine", registeredWines["apple_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true),
+        WineItemDefinition("mead", registeredWines["mead"]!!, { MobEffects.DIG_SPEED }, 1600, 0, true),
+        WineItemDefinition("glowing_wine", registeredWines["glowing_wine"]!!, { MobEffects.GLOWING }, 1600, 0, true),
+        WineItemDefinition("solaris_wine", registeredWines["solaris_wine"]!!, { MobEffects.HEALTH_BOOST }, 1600, 0, true),
+        WineItemDefinition("kelp_cider", registeredWines["kelp_cider"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.WATER_WALKER.get()
+        WineItemDefinition("eiswein", registeredWines["eiswein"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.FROSTY_ARMOR_EFFECT.get()
+        WineItemDefinition("aegis_wine", registeredWines["aegis_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.ARMOR_EFFECT.get()
+        WineItemDefinition("villagers_fright", registeredWines["villagers_fright"]!!, { MobEffects.BAD_OMEN }, 1600, 0, true),
+        WineItemDefinition("clark_wine", registeredWines["clark_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.IMPROVED_JUMP_BOOST.get()
+        WineItemDefinition("jellie_wine", registeredWines["jellie_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.JELLIE.get()
+        WineItemDefinition("noir_wine", registeredWines["noir_wine"]!!, { MobEffects.JUMP }, 1600, 0, true),
+        WineItemDefinition("red_wine", registeredWines["red_wine"]!!, { MobEffects.SLOW_FALLING }, 1600, 0, true),
+        WineItemDefinition("strad_wine", registeredWines["strad_wine"]!!, { MobEffects.NIGHT_VISION }, 1600, 0, true),
+        WineItemDefinition("cherry_wine", registeredWines["cherry_wine"]!!, { MobEffects.INVISIBILITY }, 1600, 0, true),
+        WineItemDefinition("cristel_wine", registeredWines["cristel_wine"]!!, { MobEffects.WATER_BREATHING }, 1600, 0, true),
+        WineItemDefinition("lilitu_wine", registeredWines["lilitu_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.PARTY_EFFECT.get()
+        WineItemDefinition("jo_special_mixture", registeredWines["jo_special_mixture"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.CLIMBING_EFFECT.get()
+        WineItemDefinition("bolvar_wine", registeredWines["bolvar_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.LAVA_WALKER.get()
+        WineItemDefinition("magnetic_wine", registeredWines["magnetic_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.MAGNET.get()
+        WineItemDefinition("stal_wine", registeredWines["stal_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.HEALTH_EFFECT.get()
+        WineItemDefinition("chenet_wine", registeredWines["chenet_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.CLIMBING_EFFECT.get()
+        WineItemDefinition("bottle_mojang_noir", registeredWines["bottle_mojang_noir"]!!, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // MobEffectRegistry.EXPERIENCE_EFFECT.get()
+        WineItemDefinition("chorus_wine", registeredWines["chorus_wine"]!!, { MobEffects.DAMAGE_RESISTANCE }, 10, 0, false), // MobEffectRegistry.TELEPORT.get()
+        WineItemDefinition("creepers_crush", registeredWines["creepers_crush"]!!, { MobEffects.DAMAGE_RESISTANCE }, 100, 0, false), // MobEffectRegistry.CREEPER_EFFECT.get()
+        WineItemDefinition("mellohi_wine", registeredWines["mellohi_wine"]!!, { MobEffects.HEAL }, 0, 0, false)
+    )
+
+    // Map to store registered wine items for easy access
+    val registeredWineItems: Map<String, Item> = wineItemDefinitions.associate { wine ->
+        wine.name to registerWineItem(wine)
+    }
+
+    /**
+     * Registers a wine item with the specified properties.
+     */
+    private fun registerWineItem(wine: WineItemDefinition): Item {
+        val settings = createWineSettings(wine.effect, wine.duration, wine.strength)
+        return register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation(MODID, wine.name),
+            DrinkBlockItem(
+                wine.wineBlock,
+                settings.get().properties,
+                wine.name,
+                settings.get().baseDuration,
+                wine.scaleDurationWithAge
+            )
+        )
+    }
+
+    init {
+        /**
+         * Validates that there are no duplicate wine names in [wineTypes].
+         * Throws an exception if duplicates are found, ensuring unique registration.
+         */
+        val wineBlockDuplicates = wineTypes.groupBy { it.name }.filter { it.value.size > 1 }
+        check(wineBlockDuplicates.isEmpty()) { "Duplicate wine names found in JSON: ${wineBlockDuplicates.keys}" }
+        // Validate no duplicate names
+        val wineItemDuplicates = wineItemDefinitions.groupBy { it.name }.filter { it.value.size > 1 }
+        check(wineItemDuplicates.isEmpty()) { "Duplicate wine item names found: ${wineItemDuplicates.keys}" }
+    }
+
+    /**
+     * Creates wine settings with the given effect, duration, and strength.
+     */
+    private fun createWineSettings(effect: Supplier<MobEffect?>?, duration: Int, strength: Int): Supplier<WineSettings> {
+        return Supplier { WineSettings(effect, duration, strength) }
+    }
 
     /**
      * Map of lattice types to their registered blocks.
@@ -284,4 +275,17 @@ class VineryObjectRegistry {
     val JUNGLE_LATTICE get() = LATTICES["jungle"]!!
     val MANGROVE_LATTICE get() = LATTICES["mangrove"]!!
     val DARK_CHERRY_LATTICE get() = LATTICES["dark_cherry"]!!
+
+    // Convenience accessors (optional)
+    val RED_WINE_ITEM: Item get() = registeredWineItems["red_wine"]!!
+    val MEAD_ITEM: Item get() = registeredWineItems["mead"]!!
+    val CHORUS_WINE_ITEM: Item get() = registeredWineItems["chorus_wine"]!!
+    // Add more as needed
+
+    // Convenience accessors for specific wines (optional)
+    val RED_WINE: WineBottleBlock get() = registeredWines["red_wine"]!!
+    val CHORUS_WINE: WineBottleBlock get() = registeredWines["chorus_wine"]!!
+    val MEAD: WineBottleBlock get() = registeredWines["mead"]!!
+    // Add more as needed
+
 }
