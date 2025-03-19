@@ -49,7 +49,7 @@ class WineSettings(
             val builder = FoodProperties.Builder()
                 .alwaysEat()
             if (effect != null) {
-                builder.effect(MobEffectInstance(effect.get(), duration, strength), 1.0f)
+                effect.get()?.let { MobEffectInstance(it, duration, strength) }?.let { builder.effect(it, 1.0f) }
             }
             return builder.build()
         }
