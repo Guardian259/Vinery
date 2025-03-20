@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.satisfy.vinery.Vinery.Companion.config
+import net.satisfy.vinery.client.gui.handler.FermentationBarrelGuiHandler
 import net.satisfy.vinery.registry.VineryEntityRegistry.FERMENTATION_BARREL_ENTITY
 import net.satisfy.vinery.registry.VineryGrapeRegistry.WINE_BOTTLE
 import net.satisfy.vinery.util.ImplementedInventory
@@ -44,7 +45,7 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
                 0 -> this@FermentationBarrelBlockEntity.fermentationTime
                 1 -> Objects.requireNonNull<SimpleConfig?>(config).getOrDefault("totalFermentationTime", 6000)
                 2 -> this@FermentationBarrelBlockEntity.fluidLevel
-//                3 -> this.juiceTypeValue
+                3 -> this@FermentationBarrelBlockEntity.juiceTypeValue
                 else -> 0
             }
         }
@@ -144,7 +145,7 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun setChanged() { TODO("Not yet implemented") }
-
+    //TODO: Implement the RecipeTypesRegistry with the new data-driven approach
 //    private fun canCraft(recipe: FermentationBarrelRecipe?, access: RegistryAccess): Boolean {
 //        if (recipe == null || recipe.getResultItem(access).isEmpty()) {
 //            return false
@@ -243,8 +244,8 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
 
         items[slot] = stack
 
-        if (stack.count > this.getMaxStackSize()) {
-            stack.count = this.getMaxStackSize()
+        if (stack.count > this.maxStackSize) {
+            stack.count = this.maxStackSize
         }
 
         if (!sameItem && isIngredientSlot(slot)) {
@@ -255,9 +256,7 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
         }
     }
 
-    private fun isIngredientSlot(slot: Int): Boolean {
-        return slot >= 1 && slot <= 3
-    }
+    private fun isIngredientSlot(slot: Int): Boolean = slot in 1..3
 
     override fun stillValid(player: Player): Boolean {
         checkNotNull(this.level)
@@ -281,15 +280,9 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
         return tag
     }
 
-    override fun createMenu(i: Int, inventory: Inventory, player: Player): AbstractContainerMenu? {
-        TODO("Not yet implemented")
-    }
+    override fun getDisplayName(): Component = Component.translatable(blockState.block.descriptionId)
 
-    override fun getDisplayName(): Component {
-        return Component.translatable(blockState.block.descriptionId)
-    }
-
-//    override fun createMenu(syncId: Int, inv: Inventory, player: Player): AbstractContainerMenu? = FermentationBarrelGuiHandler(syncId, inv, this, this.propertyDelegate)
+    override fun createMenu(syncId: Int, inv: Inventory, player: Player): AbstractContainerMenu = FermentationBarrelGuiHandler(syncId, inv, this, this.propertyDelegate)
 
 
     override fun getItem(slot: Int): ItemStack = items[slot]
@@ -300,6 +293,7 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
 
     override fun clearContent() { items.clear() }
 
+    //TODO: Implement the RecipeTypesRegistry with the new data-driven approach
 //    private fun isIngredient(stack: ItemStack): Boolean {
 //        if (level == null) return false
 //        return level!!.recipeManager
@@ -321,7 +315,7 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
         }
         return intArrayOf()
     }
-
+    //TODO: Rework JuiceUtil to make it obsolete and compatible with the new data-driven approach
 //    override fun canPlaceItemThroughFace(slot: Int, stack: ItemStack, side: Direction?): Boolean {
 //        if (side == Direction.UP) {
 //            if (slot == GRAPEJUICE_INPUT_SLOT && JuiceUtil.isJuice(stack)) {
@@ -358,7 +352,8 @@ class FermentationBarrelBlockEntity(pos: BlockPos?, state: BlockState?) :
         const val GRAPEJUICE_INPUT_SLOT: Int = 0
         const val OUTPUT_SLOT_GENERAL: Int = 5
         const val WINE_BOTTLE_SLOT: Int = 4
-
+        
+        //TODO: Implement the RecipeTypesRegistry with the new data-driven approach
 //        fun tick(world: Level, pos: BlockPos, blockEntity: FermentationBarrelBlockEntity) {
 //            if (world.isClientSide) return
 //

@@ -37,7 +37,7 @@ class FermentationBarrelBlock(properties: Properties) : HorizontalDirectionalBlo
         hand: InteractionHand,
         hit: BlockHitResult
     ): InteractionResult? {
-        if (world.isClientSide) return InteractionResult.SUCCESS //TODO:Confirm this is still needed since polyer will make this fully server-sided
+        if (world.isClientSide) return InteractionResult.SUCCESS //TODO:Confirm this is still needed since polymer will make this fully server-sided
 
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is FermentationBarrelBlockEntity) {

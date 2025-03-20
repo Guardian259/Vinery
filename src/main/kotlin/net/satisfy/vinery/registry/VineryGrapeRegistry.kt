@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.Vinery.Companion.log
-import net.satisfy.vinery.block.FermentationBarrelBlock
 import net.satisfy.vinery.block.GrapeBush
 import net.satisfy.vinery.block.GrapeVineBlock
 import net.satisfy.vinery.item.GrapeBushSeedItem
