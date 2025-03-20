@@ -34,9 +34,6 @@ object VineryGrapeRegistry {
     /** Base wine bottle item, used for grape juice generation. */
     val WINE_BOTTLE: VineryItem = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties(), "wine_bottle"))
 
-    /** Fermentation barrel block, copied from barrel properties with no occlusion. */
-    val FERMENTATION_BARREL: FermentationBarrelBlock = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
-
     /**
      * Represents a grape variant with properties loaded from JSON or defined programmatically.
      *

@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.Vinery.Companion.log
+import net.satisfy.vinery.block.FermentationBarrelBlock
 import net.satisfy.vinery.block.LatticeBlock
 import net.satisfy.vinery.block.PaleStemBlock
 import net.satisfy.vinery.block.WineBottleBlock
@@ -28,7 +29,7 @@ import java.util.function.Supplier
  * Fallback defaults are provided if JSON loading fails. All registrations use Minecraft's
  * built-in registries via a generic `register` utility.
  */
-class VineryObjectRegistry {
+object VineryObjectRegistry {
 
     /** Properties for wine bottle blocks, copied from glass with no occlusion and instant breaking. */
     private val wineSettings = BlockBehaviour.Properties.copy(Blocks.GLASS).noOcclusion().instabreak()
@@ -39,6 +40,10 @@ class VineryObjectRegistry {
         ResourceLocation(MODID, "grapevine_stem"),
         PaleStemBlock(BlockBehaviour.Properties.of().strength(2.0f).randomTicks().sound(SoundType.WOOD).noOcclusion())
     )
+
+    /** Fermentation barrel block, copied from barrel properties with no occlusion. */
+    val FERMENTATION_BARREL: FermentationBarrelBlock = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
+
 
     /**
      * Defines a wine's block and item properties, loaded from `wines.json`.
