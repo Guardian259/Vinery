@@ -1,4 +1,4 @@
-package net.satisfy.vinery.util
+package net.satisfy.vinery.registry
 
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
@@ -18,6 +18,7 @@ import net.satisfy.vinery.block.LatticeBlock
 import net.satisfy.vinery.block.PaleStemBlock
 import net.satisfy.vinery.block.WineBottleBlock
 import net.satisfy.vinery.item.DrinkBlockItem
+import net.satisfy.vinery.util.WineSettings
 import java.util.function.Supplier
 
 
@@ -106,31 +107,31 @@ class VineryObjectRegistry {
         log.info("Failed to load wines.json: ${e.message}. Using fallback defaults.")
         listOf(
             //TODO:Remove after building out Custom Mob Effects for Vinery
-            WineDefinition("chorus_wine", 1, { MobEffects.DAMAGE_RESISTANCE }, 10, 0, false), // vinery:teleport
+            WineDefinition("chorus_wine", 1, { MobEffectRegistry.TELEPORT }, 10, 0, false),
             WineDefinition("cherry_wine", 3, { MobEffects.INVISIBILITY }, 1600, 0, true),
-            WineDefinition("magnetic_wine", 1, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:magnet
-            WineDefinition("jo_special_mixture", 1, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:climbing_effect
+            WineDefinition("magnetic_wine", 1, { MobEffectRegistry.MAGNET }, 1600, 0, true),
+            WineDefinition("jo_special_mixture", 1, { MobEffectRegistry.CLIMBING_EFFECT }, 1600, 0, true),
             WineDefinition("cristel_wine", 1, { MobEffects.WATER_BREATHING }, 1600, 0, true),
             WineDefinition("glowing_wine", 1, { MobEffects.GLOWING }, 1600, 0, true),
-            WineDefinition("creepers_crush", 1, { MobEffects.DAMAGE_RESISTANCE }, 100, 0, false), // vinery:creeper_effect
+            WineDefinition("creepers_crush", 1, { MobEffectRegistry.CREEPER_EFFECT }, 100, 0, false),
             WineDefinition("mead", 2, { MobEffects.DIG_SPEED }, 1600, 0, true),
             WineDefinition("red_wine", 3, { MobEffects.SLOW_FALLING }, 1600, 0, true),
-            WineDefinition("jellie_wine", 1, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:jellie
-            WineDefinition("stal_wine", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:health_effect
+            WineDefinition("jellie_wine", 1, { MobEffectRegistry.JELLIE }, 1600, 0, true),
+            WineDefinition("stal_wine", 3, { MobEffectRegistry.HEALTH_EFFECT }, 1600, 0, true),
             WineDefinition("noir_wine", 3, { MobEffects.JUMP }, 1600, 0, true),
-            WineDefinition("bolvar_wine", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:lava_walker
+            WineDefinition("bolvar_wine", 3, { MobEffectRegistry.LAVA_WALKER }, 1600, 0, true),
             WineDefinition("solaris_wine", 3, { MobEffects.HEALTH_BOOST }, 1600, 0, true),
-            WineDefinition("eiswein", 2, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:frosty_armor_effect
-            WineDefinition("chenet_wine", 2, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:climbing_effect
-            WineDefinition("kelp_cider", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:water_walker
-            WineDefinition("aegis_wine", 2, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:armor_effect
-            WineDefinition("clark_wine", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:improved_jump_boost
+            WineDefinition("eiswein", 2, { MobEffectRegistry.ARMOR_EFFECT }, 1600, 0, true),
+            WineDefinition("chenet_wine", 2, { MobEffectRegistry.CLIMBING_EFFECT }, 1600, 0, true),
+            WineDefinition("kelp_cider", 3, { MobEffectRegistry.WATER_WALKER }, 1600, 0, true),
+            WineDefinition("aegis_wine", 2, { MobEffectRegistry.ARMOR_EFFECT }, 1600, 0, true),
+            WineDefinition("clark_wine", 3, { MobEffectRegistry.IMPROVED_JUMP_BOOST }, 1600, 0, true),
             WineDefinition("mellohi_wine", 2, { MobEffects.HEAL }, 0, 0, false),
             WineDefinition("strad_wine", 2, { MobEffects.NIGHT_VISION }, 1600, 0, true),
             WineDefinition("apple_cider", 3, { MobEffects.DAMAGE_BOOST }, 1600, 0, true),
             WineDefinition("apple_wine", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true),
-            WineDefinition("lilitu_wine", 1, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:party_effect
-            WineDefinition("bottle_mojang_noir", 3, { MobEffects.DAMAGE_RESISTANCE }, 1600, 0, true), // vinery:experience_effect
+            WineDefinition("lilitu_wine", 1, { MobEffectRegistry.PARTY_EFFECT }, 1600, 0, true),
+            WineDefinition("bottle_mojang_noir", 3, { MobEffectRegistry.EXPERIENCE_EFFECT }, 1600, 0, true),
             WineDefinition("villagers_fright", 3, { MobEffects.BAD_OMEN }, 1600, 0, true)
         )
     }

@@ -3,8 +3,9 @@ package net.satisfy.vinery
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils
 import net.darktree.simpleconfig.SimpleConfig
 import net.fabricmc.api.ModInitializer
-import net.satisfy.vinery.util.VineryGrapeRegistry
-import net.satisfy.vinery.util.VineryObjectRegistry
+import net.satisfy.vinery.registry.MobEffectRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryObjectRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -20,6 +21,7 @@ class Vinery : ModInitializer {
         config = SimpleConfig.of("vinery").provider { filename: String -> this.getDefaultConfig(filename) }
             .request()
         VineryGrapeRegistry
+        MobEffectRegistry
         VineryObjectRegistry()
         PolymerResourcePackUtils.addModAssets(MODID)
         log.info("Vinery Initializing Complete, Success!")

@@ -1,4 +1,4 @@
-package net.satisfy.vinery.util
+package net.satisfy.vinery.registry
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -20,6 +20,7 @@ import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.item.GrapeItem
 import net.satisfy.vinery.item.GrapejuiceBottleItem
 import net.satisfy.vinery.item.VineryItem
+import net.satisfy.vinery.util.GrapeType
 
 
 /**
@@ -219,7 +220,8 @@ object VineryGrapeRegistry {
                 val grapeName = if (variant.id == "red" || variant.id == "white") "${variant.id}_grape" else "${variant.id.split("_")[0]}_grapes_${variant.id.split("_")[1]}"
                 val grape = registerGrapes(grapeName, GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds, grapeName))
                 val grapeJuice = if (variant.id == "red" || variant.id == "white") "${variant.id}_grapejuice" else "${variant.id.split("_")[1]}_${variant.id.split("_")[0]}_grapejuice"
-                val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, grapeJuice), GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem()), grapeJuice))
+                val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, grapeJuice), GrapejuiceBottleItem(Item.Properties().craftRemainder(
+                    WINE_BOTTLE.asItem()), grapeJuice))
                 grapeType.setItems({ grape }, { seeds }, { juice })
                 put(variant, GrapeSet(grapeType, bush, seeds, grape, juice))
             }
