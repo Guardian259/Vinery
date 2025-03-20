@@ -1,0 +1,11 @@
+[
+  {"id": "none", "lineage": "none", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "red", "lineage": "red", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "white", "lineage": "white", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "savanna_red", "lineage": "red_savanna", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "savanna_white", "lineage": "white_savanna", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "taiga_red", "lineage": "red_taiga", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "taiga_white", "lineage": "white_taiga", "prefix": "", "suffix": "", "needsLattice": false},
+  {"id": "jungle_red", "lineage": "red_jungle", "prefix": "", "suffix": "", "needsLattice": true},
+  {"id": "jungle_white", "lineage": "white_jungle", "prefix": "", "suffix": "", "needsLattice": true}
+]

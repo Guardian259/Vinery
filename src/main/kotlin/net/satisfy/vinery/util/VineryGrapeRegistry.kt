@@ -1,5 +1,7 @@
 package net.satisfy.vinery.util
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import net.minecraft.core.Registry.register
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
@@ -10,6 +12,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.satisfy.vinery.Vinery.Companion.MODID
+import net.satisfy.vinery.Vinery.Companion.log
 import net.satisfy.vinery.block.FermentationBarrelBlock
 import net.satisfy.vinery.block.GrapeBush
 import net.satisfy.vinery.block.GrapeVineBlock
@@ -19,17 +22,22 @@ import net.satisfy.vinery.item.GrapejuiceBottleItem
 import net.satisfy.vinery.item.VineryItem
 
 
+/**
+ * Registry for grape-related objects in the Vinery mod, managing grape types and their associated items.
+ * Grape variants are loaded from `grapes.json`, with fallbacks for predefined types if loading fails.
+ */
 object VineryGrapeRegistry {
     /** Set of all registered grape types. */
     val GRAPE_TYPES: MutableSet<GrapeType> = HashSet()
 
-    /** Base wine bottle item, used for grape juice generation */
+    /** Base wine bottle item, used for grape juice generation. */
     val WINE_BOTTLE: VineryItem = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, "wine_bottle"), VineryItem(Item.Properties(), "wine_bottle"))
+
+    /** Fermentation barrel block, copied from barrel properties with no occlusion. */
     val FERMENTATION_BARREL: FermentationBarrelBlock = register(BuiltInRegistries.BLOCK, ResourceLocation(MODID, "fermentation_barrel"), FermentationBarrelBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()))
 
-    //TODO:Rework this into a data-driven system & streamline the Item registration process
     /**
-     * Represents a grape variant with a flexible lineage and optional prefix/suffix.
+     * Represents a grape variant with properties loaded from JSON or defined programmatically.
      *
      * @property id Unique identifier for the variant (e.g., "red_jungle").
      * @property lineage Tracks the heritage of the variant (e.g., "red", "red_jungle").
@@ -37,24 +45,13 @@ object VineryGrapeRegistry {
      * @property suffix Optional suffix for the variant (e.g., "elite").
      * @property needsLattice Whether the variant requires a lattice to grow.
      */
-    sealed class GrapeVariant(
+    open class GrapeVariant(
         val id: String,
         val lineage: String,
         val prefix: String = "",
         val suffix: String = "",
         val needsLattice: Boolean = false
     ) {
-        // Predefined variants with initial lineages
-        data object NONE : GrapeVariant("none", "none")
-        data object RED : GrapeVariant("red", "red")
-        data object WHITE : GrapeVariant("white", "white")
-        data object SAVANNA_RED : GrapeVariant("savanna_red", "red_savanna")
-        data object SAVANNA_WHITE : GrapeVariant("savanna_white", "white_savanna")
-        data object TAIGA_RED : GrapeVariant("taiga_red", "red_taiga")
-        data object TAIGA_WHITE : GrapeVariant("taiga_white", "white_taiga")
-        data object JUNGLE_RED : GrapeVariant("jungle_red", "red_jungle", needsLattice = true)
-        data object JUNGLE_WHITE : GrapeVariant("jungle_white", "white_jungle", needsLattice = true)
-
         /**
          * A dynamic variant that can evolve and have its lineage modified.
          *
@@ -77,10 +74,7 @@ object VineryGrapeRegistry {
             suffix = customSuffix,
             needsLattice = customNeedsLattice
         ) {
-            /**
-             * Evolves this variant into a distinct entity, optionally appending a suffix.
-             * The lineage is updated to match the current id, and a new suffix may be added.
-             */
+            /** Evolves this variant into a distinct entity, optionally appending a suffix. */
             fun evolveToDistinct() {
                 if (shouldEvolve()) {
                     val newSuffix = generateEvolutionSuffix()
@@ -92,48 +86,69 @@ object VineryGrapeRegistry {
                 }
             }
 
-            /** Checks if this variant should evolve based on undefined criteria. */
-            private fun shouldEvolve(): Boolean {
-                return false // Placeholder for future criteria (e.g., growth success)
-            }
+            /** Checks if this variant should evolve (placeholder). */
+            private fun shouldEvolve(): Boolean = false // Future criteria TBD
         }
 
         companion object {
-            /** List of all predefined grape variants. */
-            val predefinedVariants: List<GrapeVariant> = listOf(
-                NONE, RED, WHITE, SAVANNA_RED, SAVANNA_WHITE,
-                TAIGA_RED, TAIGA_WHITE, JUNGLE_RED, JUNGLE_WHITE
+            /** Loads grape variants from a JSON resource or returns fallback defaults. */
+            fun loadVariants(): List<GrapeVariant> {
+                return try {
+                    val gson = Gson()
+                    val inputStream = VineryGrapeRegistry::class.java.classLoader.getResourceAsStream("data/$MODID/grapes.json")
+                        ?: throw IllegalStateException("Grape variants JSON not found at data/$MODID/grapes.json")
+                    val jsonString = inputStream.bufferedReader().use { it.readText() }
+                    val listType = object : TypeToken<List<JsonGrapeVariant>>() {}.type
+                    val jsonVariants: List<JsonGrapeVariant> = gson.fromJson(jsonString, listType)
+                    log.info("Loaded grapes.json from: data/$MODID/grapes.json")
+                    jsonVariants.map { json ->
+                        GrapeVariant(
+                            id = json.id,
+                            lineage = json.lineage,
+                            prefix = json.prefix ?: "",
+                            suffix = json.suffix ?: "",
+                            needsLattice = json.needsLattice ?: false
+                        )
+                    }
+                } catch (e: Exception) {
+                    log.info("Failed to load grapes.json: ${e.message}. Using fallback defaults.")
+                    listOf(
+                        GrapeVariant("none", "none", "", "", false),
+                        GrapeVariant("red", "red", "", "", false),
+                        GrapeVariant("white", "white", "", "", false),
+                        GrapeVariant("savanna_red", "red_savanna", "", "", false),
+                        GrapeVariant("savanna_white", "white_savanna", "", "", false),
+                        GrapeVariant("taiga_red", "red_taiga", "", "", false),
+                        GrapeVariant("taiga_white", "white_taiga", "", "", false),
+                        GrapeVariant("jungle_red", "red_jungle", "", "", true),
+                        GrapeVariant("jungle_white", "white_jungle", "", "", true)
+                    )
+                }
+            }
+
+            /** JSON deserialization helper with nullable fields. */
+            private data class JsonGrapeVariant(
+                val id: String,
+                val lineage: String,
+                val prefix: String? = null,
+                val suffix: String? = null,
+                val needsLattice: Boolean? = null
             )
 
-            /** Builds an id by combining base, prefix, and suffix with proper separators. */
-            private fun buildId(base: String, prefix: String, suffix: String): String {
-                return "${if (prefix.isNotEmpty()) "${prefix}_" else ""}${base}${if (suffix.isNotEmpty()) "_$suffix" else ""}"
-            }
+            /** Builds an id by combining base, prefix, and suffix with separators. */
+            private fun buildId(base: String, prefix: String, suffix: String): String =
+                "${if (prefix.isNotEmpty()) "${prefix}_" else ""}${base}${if (suffix.isNotEmpty()) "_$suffix" else ""}"
 
-            /** Generates an optional prefix (placeholder for future system). */
-            private fun generatePrefix(): String {
-                return "" // Default until system defined (e.g., biome-based)
-            }
+            /** Placeholder for generating an optional prefix. */
+            private fun generatePrefix(): String = "" // TBD (e.g., biome-based)
 
-            /** Generates an optional suffix (placeholder for future system). */
-            private fun generateSuffix(): String {
-                return "" // Default until system defined (e.g., random trait)
-            }
+            /** Placeholder for generating an optional suffix. */
+            private fun generateSuffix(): String = "" // TBD (e.g., random trait)
 
-            /** Generates an optional suffix for evolved variants (placeholder). */
-            private fun generateEvolutionSuffix(): String {
-                return "" // Default until system defined (e.g., "prime")
-            }
+            /** Placeholder for generating an evolution suffix. */
+            private fun generateEvolutionSuffix(): String = "" // TBD (e.g., "prime")
 
-            /**
-             * Creates a derived variant from a parent lineage with optional prefix/suffix.
-             *
-             * @param parentLineage The base lineage to extend (e.g., "red").
-             * @param modifier The variant-specific modifier (e.g., "desert").
-             * @param prefix Optional prefix (defaults to generated value).
-             * @param suffix Optional suffix (defaults to generated value).
-             * @return A new CustomVariant instance.
-             */
+            /** Creates a derived variant from a parent lineage. */
             fun createVariant(
                 parentLineage: String,
                 modifier: String,
@@ -146,15 +161,7 @@ object VineryGrapeRegistry {
                 return CustomVariant(baseId, newLineage, prefix, suffix, needsLattice)
             }
 
-            /**
-             * Combines two variants into a hybrid with optional prefix/suffix.
-             *
-             * @param parent1 First parent variant.
-             * @param parent2 Second parent variant.
-             * @param prefix Optional prefix (defaults to generated value).
-             * @param suffix Optional suffix (defaults to generated value).
-             * @return A new CustomVariant instance representing the hybrid.
-             */
+            /** Combines two variants into a hybrid. */
             fun crossBreed(
                 parent1: GrapeVariant,
                 parent2: GrapeVariant,
@@ -186,23 +193,23 @@ object VineryGrapeRegistry {
         val juice: Item? = null
     )
 
-    /** Map of grape variants to their associated sets. */
+    /** Map of grape variants to their associated sets, populated from JSON or fallback. */
     private val grapeSets: MutableMap<GrapeVariant, GrapeSet<Block>> = buildMap<GrapeVariant, GrapeSet<Block>> {
-        GrapeVariant.predefinedVariants.forEach { variant ->
+        GrapeVariant.loadVariants().forEach { variant ->
             val grapeType = registerGrapeType(variant.id, variant.needsLattice)
             GRAPE_TYPES.add(grapeType)
 
-            if (variant == GrapeVariant.NONE) {
+            if (variant.id == "none") {
                 put(variant, GrapeSet(grapeType))
             } else {
                 val bushProperties = BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH)
-                val bushName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape_bush" else "${variant.id.split("_")[0]}_grape_bush_${variant.id.split("_")[1]}"
-                val bush = if (variant.needsLattice) registerGrapeVine(bushName, bushProperties, grapeType) else  registerGrapeBush(bushName, bushProperties, grapeType)
-                val seedsName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape_seeds" else "${variant.id.split("_")[0]}_grape_seeds_${variant.id.split("_")[1]}"
+                val bushName = if (variant.id == "red" || variant.id == "white") "${variant.id}_grape_bush" else "${variant.id.split("_")[0]}_grape_bush_${variant.id.split("_")[1]}"
+                val bush = if (variant.needsLattice) registerGrapeVine(bushName, bushProperties, grapeType) else registerGrapeBush(bushName, bushProperties, grapeType)
+                val seedsName = if (variant.id == "red" || variant.id == "white") "${variant.id}_grape_seeds" else "${variant.id.split("_")[0]}_grape_seeds_${variant.id.split("_")[1]}"
                 val seeds = registerGrapeSeeds(seedsName, GrapeBushSeedItem(bush, Item.Properties(), grapeType, seedsName))
-                val grapeName = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grape" else "${variant.id.split("_")[0]}_grapes_${variant.id.split("_")[1]}"
+                val grapeName = if (variant.id == "red" || variant.id == "white") "${variant.id}_grape" else "${variant.id.split("_")[0]}_grapes_${variant.id.split("_")[1]}"
                 val grape = registerGrapes(grapeName, GrapeItem(Item.Properties().food(Foods.SWEET_BERRIES), grapeType, seeds, grapeName))
-                val grapeJuice = if (variant.id == GrapeVariant.RED.id || variant.id == GrapeVariant.WHITE.id) "${variant.id}_grapejuice" else "${variant.id.split("_")[1]}_${variant.id.split("_")[0]}_grapejuice"
+                val grapeJuice = if (variant.id == "red" || variant.id == "white") "${variant.id}_grapejuice" else "${variant.id.split("_")[1]}_${variant.id.split("_")[0]}_grapejuice"
                 val juice = register(BuiltInRegistries.ITEM, ResourceLocation(MODID, grapeJuice), GrapejuiceBottleItem(Item.Properties().craftRemainder(WINE_BOTTLE.asItem()), grapeJuice))
                 grapeType.setItems({ grape }, { seeds }, { juice })
                 put(variant, GrapeSet(grapeType, bush, seeds, grape, juice))
@@ -210,13 +217,14 @@ object VineryGrapeRegistry {
         }
     }.toMutableMap()
 
-    // Convenience accessors for predefined variants
-    val NONE = grapeSets[GrapeVariant.NONE]!!.type
-    val RED = grapeSets[GrapeVariant.RED]!!
-    val WHITE = grapeSets[GrapeVariant.WHITE]!!
-    val SAVANNA_RED = grapeSets[GrapeVariant.SAVANNA_RED]!!
-    val JUNGLE_RED = grapeSets[GrapeVariant.JUNGLE_RED]!!
-    val JUNGLE_WHITE = grapeSets[GrapeVariant.JUNGLE_WHITE]!!
+    // Convenience accessors for predefined variants (using lazy initialization)
+    val NONE by lazy { grapeSets.entries.find { it.key.id == "none" }!!.value.type }
+    val RED by lazy { grapeSets.entries.find { it.key.id == "red" }!!.value }
+    val WHITE by lazy { grapeSets.entries.find { it.key.id == "white" }!!.value }
+    val SAVANNA_RED by lazy { grapeSets.entries.find { it.key.id == "savanna_red" }!!.value }
+    //TODO: MOVE AWAY FROM STRICTLY ACCESSED VARIANTS
+    val JUNGLE_RED by lazy { grapeSets.entries.find { it.key.id == "jungle_red" }!!.value }
+    val JUNGLE_WHITE by lazy { grapeSets.entries.find { it.key.id == "jungle_white" }!!.value }
 
     //TODO:Will currently break with the fixed grapeSets system which sends the element name to the classes. determine if this should be removed or reworked
     /**
