@@ -24,7 +24,7 @@ import net.satisfy.vinery.item.VineryItem
 
 /**
  * Registry for grape-related objects in the Vinery mod, managing grape types and their associated items.
- * Grape variants are loaded from `grapes.json`, with fallbacks for predefined types if loading fails.
+ * Grape variants are loaded from `grape_variants.json`, with fallbacks for predefined types if loading fails.
  */
 object VineryGrapeRegistry {
     /** Set of all registered grape types. */
@@ -91,37 +91,27 @@ object VineryGrapeRegistry {
         }
 
         companion object {
-            /** Loads grape variants from a JSON resource or returns fallback defaults. */
-            fun loadVariants(): List<GrapeVariant> {
-                return try {
-                    val gson = Gson()
-                    val inputStream = VineryGrapeRegistry::class.java.classLoader.getResourceAsStream("data/$MODID/grapes.json")
-                        ?: throw IllegalStateException("Grape variants JSON not found at data/$MODID/grapes.json")
-                    val jsonString = inputStream.bufferedReader().use { it.readText() }
-                    val listType = object : TypeToken<List<JsonGrapeVariant>>() {}.type
-                    val jsonVariants: List<JsonGrapeVariant> = gson.fromJson(jsonString, listType)
-                    log.info("Loaded grapes.json from: data/$MODID/grapes.json")
-                    jsonVariants.map { json ->
-                        GrapeVariant(
-                            id = json.id,
-                            lineage = json.lineage,
-                            prefix = json.prefix ?: "",
-                            suffix = json.suffix ?: "",
-                            needsLattice = json.needsLattice ?: false
-                        )
-                    }
-                } catch (e: Exception) {
-                    log.info("Failed to load grapes.json: ${e.message}. Using fallback defaults.")
-                    listOf(
-                        GrapeVariant("none", "none", "", "", false),
-                        GrapeVariant("red", "red", "", "", false),
-                        GrapeVariant("white", "white", "", "", false),
-                        GrapeVariant("savanna_red", "red_savanna", "", "", false),
-                        GrapeVariant("savanna_white", "white_savanna", "", "", false),
-                        GrapeVariant("taiga_red", "red_taiga", "", "", false),
-                        GrapeVariant("taiga_white", "white_taiga", "", "", false),
-                        GrapeVariant("jungle_red", "red_jungle", "", "", true),
-                        GrapeVariant("jungle_white", "white_jungle", "", "", true)
+            /**
+             * Loads grape variants from a JSON resource.
+             *
+             * @param resourcePath Path to the JSON file (e.g., "data/vinery/grape_variants.json").
+             * @return List of parsed grape variants.
+             * @throws IllegalStateException If the JSON resource is not found.
+             */
+            fun loadFromJson(resourcePath: String): List<GrapeVariant> {
+                val gson = Gson()
+                val inputStream = VineryGrapeRegistry::class.java.classLoader.getResourceAsStream(resourcePath)
+                    ?: throw IllegalStateException("Grape variants JSON not found at $resourcePath")
+                val jsonString = inputStream.bufferedReader().use { it.readText() }
+                val listType = object : TypeToken<List<JsonGrapeVariant>>() {}.type
+                val jsonVariants: List<JsonGrapeVariant> = gson.fromJson(jsonString, listType)
+                return jsonVariants.map { json ->
+                    GrapeVariant(
+                        id = json.id,
+                        lineage = json.lineage,
+                        prefix = json.prefix ?: "",
+                        suffix = json.suffix ?: "",
+                        needsLattice = json.needsLattice ?: false
                     )
                 }
             }
@@ -193,9 +183,28 @@ object VineryGrapeRegistry {
         val juice: Item? = null
     )
 
+    /** List of grape variants loaded from JSON or fallback defaults if loading fails. */
+    private val grapeVariants: List<GrapeVariant> = try {
+        GrapeVariant.loadFromJson("data/$MODID/grape_variants.json")
+            .also { log.info("Loaded grape_variants.json from: data/$MODID/grape_variants.json") }
+    } catch (e: Exception) {
+        log.info("Failed to load grape_variants.json: ${e.message}. Using fallback defaults.")
+        listOf(
+            GrapeVariant("none", "none", "", "", false),
+            GrapeVariant("red", "red", "", "", false),
+            GrapeVariant("white", "white", "", "", false),
+            GrapeVariant("savanna_red", "red_savanna", "", "", false),
+            GrapeVariant("savanna_white", "white_savanna", "", "", false),
+            GrapeVariant("taiga_red", "red_taiga", "", "", false),
+            GrapeVariant("taiga_white", "white_taiga", "", "", false),
+            GrapeVariant("jungle_red", "red_jungle", "", "", true),
+            GrapeVariant("jungle_white", "white_jungle", "", "", true)
+        )
+    }
+
     /** Map of grape variants to their associated sets, populated from JSON or fallback. */
     private val grapeSets: MutableMap<GrapeVariant, GrapeSet<Block>> = buildMap<GrapeVariant, GrapeSet<Block>> {
-        GrapeVariant.loadVariants().forEach { variant ->
+        grapeVariants.forEach { variant ->
             val grapeType = registerGrapeType(variant.id, variant.needsLattice)
             GRAPE_TYPES.add(grapeType)
 
