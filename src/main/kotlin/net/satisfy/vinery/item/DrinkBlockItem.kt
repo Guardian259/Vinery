@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.util.GeneralUtil
-import net.satisfy.vinery.util.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry
 import net.satisfy.vinery.util.WineYears
 import net.satisfy.vinery.util.WineYears.getEffectDuration
 import net.satisfy.vinery.util.WineYears.getEffectLevel

@@ -187,7 +187,7 @@ object VineryGrapeRegistry {
     /** List of grape variants loaded from JSON or fallback defaults if loading fails. */
     private val grapeVariants: List<GrapeVariant> = try {
         GrapeVariant.loadFromJson("data/$MODID/grape_variants.json")
-            .also { log.info("Loaded grape_variants.json from: data/$MODID/grape_variants.json") }
+            .also { log.info("Loaded grape variants from: data/$MODID/grape_variants.json") }
     } catch (e: Exception) {
         log.info("Failed to load grape_variants.json: ${e.message}. Using fallback defaults.")
         listOf(

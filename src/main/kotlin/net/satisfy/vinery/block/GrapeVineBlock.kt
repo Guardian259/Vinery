@@ -25,8 +25,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.BlockHitResult
 import net.satisfy.vinery.util.GrapeType
-import net.satisfy.vinery.util.VineryGrapeRegistry
-import net.satisfy.vinery.util.VineryGrapeRegistry.retrieveGrapeSetByType
+import net.satisfy.vinery.registry.VineryGrapeRegistry.retrieveGrapeSetByType
 import kotlin.math.min
 
 class GrapeVineBlock(settings: Properties?, val type: GrapeType) : VineBlock(settings!!), BonemealableBlock, PolymerBlock {

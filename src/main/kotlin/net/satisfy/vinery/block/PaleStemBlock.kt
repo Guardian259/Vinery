@@ -26,7 +26,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.satisfy.vinery.item.GrapeBushSeedItem
-import net.satisfy.vinery.util.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 import java.util.*
 import kotlin.math.max

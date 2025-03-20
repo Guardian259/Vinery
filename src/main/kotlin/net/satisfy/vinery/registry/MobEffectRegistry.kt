@@ -7,7 +7,6 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.effect.*
-import java.util.function.Supplier
 
 object MobEffectRegistry {
     val ARMOR_EFFECT = effect("armor_effect", ArmorEffect())

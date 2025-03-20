@@ -1,6 +1,7 @@
 package net.satisfy.vinery.util
 
 import net.minecraft.world.level.block.state.properties.Property
+import net.satisfy.vinery.registry.VineryGrapeRegistry
 import java.util.*
 
 

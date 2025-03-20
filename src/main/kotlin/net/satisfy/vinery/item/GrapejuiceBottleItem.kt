@@ -18,7 +18,7 @@ import net.minecraft.world.item.*
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.satisfy.vinery.Vinery.Companion.MODID
-import net.satisfy.vinery.util.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry
 
 
 class GrapejuiceBottleItem(properties: Properties?, juiceModelName: String) : Item(properties!!), PolymerItem {

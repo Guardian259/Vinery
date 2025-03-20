@@ -102,7 +102,7 @@ class VineryObjectRegistry {
     /** List of wine definitions loaded from JSON or fallback defaults if loading fails. */
     private val wineDefinitions: List<WineDefinition> = try {
         WineDefinition.loadFromJson("data/$MODID/wines.json")
-            .also { log.info("Loaded wines.json from: data/$MODID/wines.json") }
+            .also { log.info("Loaded wines from: data/$MODID/wines.json") }
     } catch (e: Exception) {
         log.info("Failed to load wines.json: ${e.message}. Using fallback defaults.")
         listOf(

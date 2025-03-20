@@ -26,7 +26,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.satisfy.vinery.util.GeneralUtil
 import net.satisfy.vinery.util.GrapeProperty
 import net.satisfy.vinery.util.GrapeType
-import net.satisfy.vinery.util.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 
 abstract class StemBlock(settings: Properties?) : Block(settings!!), BonemealableBlock, PolymerBlock {
