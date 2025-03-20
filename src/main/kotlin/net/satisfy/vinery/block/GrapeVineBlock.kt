@@ -26,6 +26,7 @@ import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.BlockHitResult
 import net.satisfy.vinery.util.GrapeType
 import net.satisfy.vinery.util.VineryGrapeRegistry
+import net.satisfy.vinery.util.VineryGrapeRegistry.retrieveGrapeSetByType
 import kotlin.math.min
 
 class GrapeVineBlock(settings: Properties?, val type: GrapeType) : VineBlock(settings!!), BonemealableBlock, PolymerBlock {
@@ -51,10 +52,7 @@ class GrapeVineBlock(settings: Properties?, val type: GrapeType) : VineBlock(set
             return InteractionResult.PASS
         } else if (i > 1) {
             val x = world.random.nextInt(2)
-            (if (this.type === VineryGrapeRegistry.JUNGLE_RED.type)
-                VineryGrapeRegistry.JUNGLE_RED.grape
-            else
-                VineryGrapeRegistry.JUNGLE_WHITE.grape)?.let {
+            (retrieveGrapeSetByType(type)!!.grape)?.let {
                     ItemStack(it, x + (if (bl) 1 else 0)) }?.let {
                         popResource(world, pos, it) }
             world.playSound(

@@ -219,12 +219,14 @@ object VineryGrapeRegistry {
 
     // Convenience accessors for predefined variants (using lazy initialization)
     val NONE by lazy { grapeSets.entries.find { it.key.id == "none" }!!.value.type }
-    val RED by lazy { grapeSets.entries.find { it.key.id == "red" }!!.value }
-    val WHITE by lazy { grapeSets.entries.find { it.key.id == "white" }!!.value }
-    val SAVANNA_RED by lazy { grapeSets.entries.find { it.key.id == "savanna_red" }!!.value }
-    //TODO: MOVE AWAY FROM STRICTLY ACCESSED VARIANTS
-    val JUNGLE_RED by lazy { grapeSets.entries.find { it.key.id == "jungle_red" }!!.value }
-    val JUNGLE_WHITE by lazy { grapeSets.entries.find { it.key.id == "jungle_white" }!!.value }
+
+    /**
+     * Retrieves the GrapeSet associated with a given GrapeType, if it exists.
+     *
+     * @param type The GrapeType to look up.
+     * @return The corresponding GrapeSet<Block>, or null if not found.
+     */
+    fun retrieveGrapeSetByType(type: GrapeType): GrapeSet<Block>? = grapeSets.entries.find { it.value.type == type }?.value
 
     //TODO:Will currently break with the fixed grapeSets system which sends the element name to the classes. determine if this should be removed or reworked
     /**
