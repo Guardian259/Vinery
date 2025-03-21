@@ -26,7 +26,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.satisfy.vinery.item.GrapeBushSeedItem
-import net.satisfy.vinery.registry.VineryGrapeRegistry
+import net.satisfy.vinery.registry.VineryGrapeRegistry.NONE
 import org.jetbrains.annotations.NotNull
 import java.util.*
 import kotlin.math.max
@@ -34,7 +34,7 @@ import kotlin.math.max
 @SuppressWarnings("deprecation")
 class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
     init {
-        this.registerDefaultState(defaultBlockState().setValue(GRAPE, VineryGrapeRegistry.NONE).setValue(AGE, 0))
+        this.registerDefaultState(defaultBlockState().setValue(GRAPE, NONE).setValue(AGE, 0))
     }
 
     @NotNull

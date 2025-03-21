@@ -44,9 +44,9 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
     init {
         registerDefaultState(
             defaultBlockState()
-                .setValue<Direction, Direction>(FACING, Direction.NORTH)
-                .setValue<Boolean, Boolean>(SUPPORT, true)
-                .setValue<Boolean, Boolean>(BOTTOM, false)
+                .setValue(FACING, Direction.NORTH)
+                .setValue(SUPPORT, true)
+                .setValue(BOTTOM, false)
                 .setValue(TYPE, GeneralUtil.LineConnectingType.NONE)
         )
     }
@@ -191,7 +191,7 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
         return !isMature(state) && state.getValue(AGE) > 0
     }
 
-    fun getConnection(state: BlockState, level: LevelAccessor, currentPos: BlockPos): BlockState {
+    private fun getConnection(state: BlockState, level: LevelAccessor, currentPos: BlockPos): BlockState {
         val facing: Direction = state.getValue(FACING)
 
         val stateL = level.getBlockState(currentPos.relative(facing.clockWise))

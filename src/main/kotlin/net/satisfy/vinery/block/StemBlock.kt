@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.phys.BlockHitResult
-import net.satisfy.vinery.util.GeneralUtil
 import net.satisfy.vinery.registry.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 
@@ -35,7 +34,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
         val stack: ItemStack = ItemStack(grape, x + bonus)
 
         if (direction == null) popResource(world, pos!!, stack)
-        else GeneralUtil.popResourceFromFace(world, pos!!, direction, stack)
+        else popResourceFromFace(world, pos!!, direction, stack)
 
         world.playSound(
             null,
@@ -52,7 +51,7 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
         val stack: ItemStack = ItemStack(grape)
 
         if (direction == null) popResource(world!!, pos!!, stack)
-        else GeneralUtil.popResourceFromFace(world!!, pos!!, direction, stack)
+        else popResourceFromFace(world!!, pos!!, direction, stack)
     }
 
     @Deprecated("Deprecated in Java")
