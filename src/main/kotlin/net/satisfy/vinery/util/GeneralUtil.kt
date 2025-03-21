@@ -69,11 +69,9 @@ object GeneralUtil {
         val deltaX = if (i == 0) Mth.nextDouble(level.random, -0.1, 0.1) else i.toDouble() * 0.1
         val deltaY = if (j == 0) Mth.nextDouble(level.random, 0.0, 0.1) else j.toDouble() * 0.1 + 0.1
         val deltaZ = if (k == 0) Mth.nextDouble(level.random, -0.1, 0.1) else k.toDouble() * 0.1
-        popResource(
-            level,
-            ItemEntity(level, posX + offsetX, posY + offsetY, posZ + offsetZ, itemStack, deltaX, deltaY, deltaZ),
-            itemStack!!
-        )
+        itemStack?.let {
+            ItemEntity(level, posX + offsetX, posY + offsetY, posZ + offsetZ, it, deltaX, deltaY, deltaZ)
+        }?.let { popResource(level, it, itemStack) }
     }
     private fun popResource(level: Level, itemEntity: ItemEntity, itemStack: ItemStack) {
         if (!level.isClientSide && !itemStack.isEmpty && level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {

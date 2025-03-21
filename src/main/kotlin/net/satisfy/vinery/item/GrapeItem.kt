@@ -12,10 +12,10 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.satisfy.vinery.Vinery.Companion.MODID
-import net.satisfy.vinery.util.GrapeType
+import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 
 
-class GrapeItem(settings: Properties?, val type: GrapeType, private val returnItem: Item, grapeModelName: String) : Item(settings!!), PolymerItem {
+class GrapeItem(settings: Properties?, val type: GrapeTypeDefinition, private val returnItem: Item, grapeModelName: String) : Item(settings!!), PolymerItem {
 
     private val grapeModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.SWEET_BERRIES, ResourceLocation(MODID, "item/$grapeModelName"))
 

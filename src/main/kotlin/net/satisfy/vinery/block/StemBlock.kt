@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.phys.BlockHitResult
 import net.satisfy.vinery.util.GeneralUtil
-import net.satisfy.vinery.util.GrapeProperty
-import net.satisfy.vinery.util.GrapeType
 import net.satisfy.vinery.registry.VineryGrapeRegistry
 import org.jetbrains.annotations.NotNull
 
@@ -118,14 +116,12 @@ abstract class StemBlock(settings: Properties?) : Block(settings!!), Bonemealabl
         boneMealGrow(world, state, pos)
     }
 
-    fun withAge(state: BlockState, age: Int, type: GrapeType?): BlockState {
-        return state.setValue(AGE, age).setValue(GRAPE, type!!)
-    }
+    fun withAge(state: BlockState, age: Int, type: VineryGrapeRegistry.GrapeTypeDefinition?): BlockState = state.setValue(AGE, age).setValue(GRAPE, type!!)
 
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.OAK_FENCE
 
     companion object {
-        val GRAPE: GrapeProperty = GrapeProperty.create("grape")
+        val GRAPE: VineryGrapeRegistry.GrapeProperty = VineryGrapeRegistry.GrapeProperty
         val AGE: IntegerProperty = BlockStateProperties.AGE_4
     }
 }

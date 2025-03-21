@@ -11,9 +11,9 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.satisfy.vinery.Vinery.Companion.MODID
-import net.satisfy.vinery.util.GrapeType
+import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 
-class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeType, seedsModelName: String) : ItemNameBlockItem(block!!, settings!!), PolymerItem {
+class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeTypeDefinition, seedsModelName: String) : ItemNameBlockItem(block!!, settings!!), PolymerItem {
 
     private val seedsModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.WHEAT_SEEDS, ResourceLocation(MODID, "item/$seedsModelName"))
 

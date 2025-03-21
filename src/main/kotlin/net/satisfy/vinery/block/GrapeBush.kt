@@ -29,12 +29,11 @@ import net.minecraft.world.level.pathfinder.PathComputationType
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
-import net.satisfy.vinery.Vinery
 import net.satisfy.vinery.Vinery.Companion.config
-import net.satisfy.vinery.util.GrapeType
+import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 import kotlin.math.min
 
-open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
+open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinition) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
 
     
     override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
@@ -123,7 +122,7 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         return floor.isSolidRender(world, pos)
     }
 
-    private fun getType(): GrapeType {
+    private fun getType(): GrapeTypeDefinition {
         return this.type
     }
 
@@ -140,13 +139,13 @@ open class GrapeBush(settings: Properties?, private val type: GrapeType) : BushB
         builder.add(AGE)
     }
 
-    class SavannaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeType) : GrapeBush(settings, type) {
+    class SavannaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeTypeDefinition) : GrapeBush(settings, type) {
         override fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?): Boolean {
             return world.getRawBrightness(blockPos, 0) >= 14
         }
     }
 
-    class TaigaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeType) : GrapeBush(settings, type) {
+    class TaigaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeTypeDefinition) : GrapeBush(settings, type) {
         override fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?): Boolean {
             if (world.getRawBrightness(blockPos, 0) <= 4) {
                 return false
