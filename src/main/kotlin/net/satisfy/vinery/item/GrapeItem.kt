@@ -39,10 +39,9 @@ class GrapeItem(settings: Properties?, val type: GrapeTypeDefinition, private va
             return super.finishUsingItem(stack, world, entityLiving)
         }
         if (world.random.nextFloat() < CHANCE_OF_GETTING_SEEDS) {
-            val player = entityLiving
             val seeds = ItemStack(returnItem)
-            if (!player.inventory.add(seeds)) {
-                player.drop(seeds, false)
+            if (!entityLiving.inventory.add(seeds)) {
+                entityLiving.drop(seeds, false)
             }
         }
         return super.finishUsingItem(stack, world, entityLiving)

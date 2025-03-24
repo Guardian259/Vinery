@@ -15,16 +15,8 @@ class WineSettings(
     /** The base duration of the wine's effect in ticks.  */
     val baseDuration: Int, strength: Int
 ) {
-    /**
-     * Retrieves the properties of the wine item.
-     * @return The immutable [Item.Properties] instance.
-     */
     /** The properties defining the wine's item characteristics, including food components.  */
     val properties: Item.Properties
-    /**
-     * Gets the base duration of the wine's effect.
-     * @return The duration in ticks.
-     */
 
     /**
      * Constructs a new WineSettings instance with specified effect, duration, and strength.

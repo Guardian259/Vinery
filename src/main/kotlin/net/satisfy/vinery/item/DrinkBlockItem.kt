@@ -35,6 +35,16 @@ import org.spongepowered.include.com.google.common.collect.Lists
 import java.util.*
 import kotlin.math.max
 
+/**
+ * A drinkable block item (e.g., wine) that applies effects based on age and returns a wine bottle.
+ * Extends [BlockItem] for placement and [PolymerItem] for custom glass bottle visuals.
+ *
+ * @param block The block this item places
+ * @param settings Item properties
+ * @param itemModelName Resource name for the custom model
+ * @param baseDuration Base effect duration in ticks
+ * @param scaleDurationWithAge Whether duration scales with wine age
+ */
 @Suppress("unused")
 class DrinkBlockItem(
     block: Block?,
@@ -44,20 +54,25 @@ class DrinkBlockItem(
     private val scaleDurationWithAge: Boolean
 ) : BlockItem(block!!, settings!!), PolymerItem {
 
+    /** Custom model data for the item, based on a glass bottle. */
     private val itemModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.GLASS_BOTTLE, ResourceLocation(
         MODID, "item/$itemModelName")
     )
 
-    override fun getUseAnimation(stack: ItemStack): UseAnim {
-        return UseAnim.DRINK
-    }
+    /** Returns the drinking animation. */
+    override fun getUseAnimation(stack: ItemStack): UseAnim = UseAnim.DRINK
 
+    /**
+     * Returns the block state for placement if the player is crouching and placement is valid.
+     * Returns null otherwise.
+     */
     override fun getPlacementState(context: BlockPlaceContext): BlockState? {
-        if (!Objects.requireNonNull(context.player)!!.isCrouching) return null
+        if (!context.player!!.isCrouching) return null
         val blockState = block.getStateForPlacement(context)
-        return if (blockState != null && this.canPlace(context, blockState)) blockState else null
+        return if (blockState != null && canPlace(context, blockState)) blockState else null
     }
 
+    //TODO:Complete Reimplementation
 //    override fun updateCustomBlockEntityTag(
 //        blockPos: BlockPos,
 //        level: Level,
@@ -71,50 +86,52 @@ class DrinkBlockItem(
 //        return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState)
 //    }
 
+    /**
+     * Adds tooltip info: effects with duration/amplifier, wine age, and days to next upgrade.
+     */
     override fun appendHoverText(
         stack: ItemStack,
-        @Nullable world: Level?,
+        world: Level?,
         tooltip: MutableList<Component>,
         context: TooltipFlag
     ) {
-        val effects = if (foodProperties != null) foodProperties!!.effects else Lists.newArrayList()
+        val effects = foodProperties?.effects ?: Lists.newArrayList()
         if (effects.isEmpty()) {
             tooltip.add(Component.translatable("effect.none").withStyle(ChatFormatting.GRAY))
         } else {
-            for (effectPair in effects) {
-                val effectInstance = effectPair.first
-                val effect = effectInstance.effect
-                val effectName = effect.displayName.string
-                val amplifier = max(0.0, getEffectLevel(stack, world).toDouble()).toInt()
-                val amplifierRoman = if (amplifier > 0) " " + toRoman(amplifier) else ""
-                var durationTicks = if (scaleDurationWithAge) getEffectDuration(stack, world) else baseDuration
-                durationTicks = max(0.0, durationTicks.toDouble()).toInt()
-                val formattedDuration = formatDuration(durationTicks)
-                val tooltipText = "$effectName$amplifierRoman ($formattedDuration)"
+            // List each effect with name, amplifier, and duration
+            effects.forEach { effectPair ->
+                val effect = effectPair.first.effect
+                val amplifier = getEffectLevel(stack, world)
+                val amplifierRoman = if (amplifier > 0) " ${toRoman(amplifier)}" else ""
+                val durationTicks = if (scaleDurationWithAge) getEffectDuration(stack, world) else baseDuration
+                val tooltipText = "${effect.displayName.string}$amplifierRoman (${formatDuration(durationTicks)})"
                 tooltip.add(Component.literal(tooltipText).withStyle(effect.category.tooltipFormatting))
             }
         }
         tooltip.add(Component.empty())
-        if (world != null) {
-            val age = max(0.0, getWineAge(stack, world).toDouble()).toInt()
+        // Append age and next upgrade info if world is available
+        world?.let {
+            val age = getWineAge(stack, it)
             tooltip.add(Component.translatable("tooltip.vinery.age", age).withStyle(ChatFormatting.WHITE))
             tooltip.add(Component.empty())
             val yearsToNextUpgrade = WineYears.YEARS_PER_EFFECT_LEVEL - (age % WineYears.YEARS_PER_EFFECT_LEVEL)
-            val daysToNextUpgrade = max(0.0, (yearsToNextUpgrade * WineYears.DAYS_PER_YEAR).toDouble())
-                .toInt()
+            val daysToNextUpgrade = yearsToNextUpgrade * WineYears.DAYS_PER_YEAR
             tooltip.add(
                 Component.translatable("tooltip.vinery.next_upgrade", daysToNextUpgrade)
-                    .withStyle { style: Style -> style.withColor(TextColor.fromRgb(0x93c47d)) })
+                    .withStyle { style -> style.withColor(TextColor.fromRgb(0x93c47d)) }
+            )
         }
     }
 
+    /**
+     * Consumes the item: applies age-based effects on server, shrinks stack, and returns a wine bottle.
+     */
     @Suppress("unused")
     override fun finishUsingItem(itemStack: ItemStack, level: Level, livingEntity: LivingEntity): ItemStack {
         if (!level.isClientSide) {
             val age = max(0.0, getWineAge(itemStack, level).toDouble()).toInt()
-            val duration =
-                max(0.0, (if (scaleDurationWithAge) getEffectDuration(itemStack, level) else baseDuration).toDouble())
-                    .toInt()
+            val duration = max(0.0, (if (scaleDurationWithAge) getEffectDuration(itemStack, level) else baseDuration).toDouble()).toInt()
             val amplifier = max(0.0, getEffectLevel(itemStack, level).toDouble()).toInt()
             val effects = Objects.requireNonNull(foodProperties)!!.effects
             for (effectPair in effects) {
@@ -131,6 +148,7 @@ class DrinkBlockItem(
         )
     }
 
+    /** Formats duration in ticks to "mm:ss" format. */
     private fun formatDuration(ticks: Int): String {
         val totalSeconds = (max(0.0, ticks.toDouble()) / 20).toInt()
         val minutes = totalSeconds / 60
@@ -138,26 +156,26 @@ class DrinkBlockItem(
         return String.format("%d:%02d", minutes, seconds)
     }
 
+    /** Initiates drinking the item instantly. */
     override fun use(
         level: Level,
         player: Player,
         interactionHand: InteractionHand
-    ): InteractionResultHolder<ItemStack> {
-        return ItemUtils.startUsingInstantly(level, player, interactionHand)
-    }
+    ): InteractionResultHolder<ItemStack> = ItemUtils.startUsingInstantly(level, player, interactionHand)
 
+    /** Sets the wine year when crafted. */
     override fun onCraftedBy(stack: ItemStack, world: Level, player: Player) {
         super.onCraftedBy(stack, world, player)
         setWineYear(stack, world)
     }
 
+    /** Updates the wine year in inventory if already set. */
     override fun inventoryTick(stack: ItemStack, world: Level, entity: Entity, slot: Int, selected: Boolean) {
         super.inventoryTick(stack, world, entity, slot, selected)
-        if (world != null && hasWineYear(stack)) {
-            setWineYear(stack, world)
-        }
+        if (world != null && hasWineYear(stack)) setWineYear(stack, world)
     }
 
+    /** Converts amplifier level to Roman numerals (I-X). */
     private fun toRoman(number: Int): String {
         return when (number) {
             0 -> "I"
@@ -174,8 +192,9 @@ class DrinkBlockItem(
         }
     }
 
+    /** Returns the base item for Polymer rendering (glass bottle). */
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.GLASS_BOTTLE
 
+    /** Returns the custom model data value for this item. */
     override fun getPolymerCustomModelData(itemStack: ItemStack?, player: ServerPlayer?): Int = itemModel.value()
-
 }

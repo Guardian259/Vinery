@@ -13,12 +13,24 @@ import net.minecraft.world.level.block.Block
 import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 
-class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeTypeDefinition, seedsModelName: String) : ItemNameBlockItem(block!!, settings!!), PolymerItem {
+/**
+ * A seed item for planting grape bushes, tied to a specific grape type.
+ * Extends [ItemNameBlockItem] for block placement and [PolymerItem] for custom seed visuals.
+ *
+ * @param block The block this seed plants
+ * @param settings Item properties
+ * @param type The grape type this seed represents
+ * @param seedsModelName Resource name for the custom seed model
+ */
+class GrapeBushSeedItem(block: Block?, settings: Properties?, val type: GrapeTypeDefinition, seedsModelName: String) :
+    ItemNameBlockItem(block!!, settings!!), PolymerItem {
 
+    /** Custom model data for the seeds, based on wheat seeds. */
     private val seedsModel: PolymerModelData = PolymerResourcePackUtils.requestModel(Items.WHEAT_SEEDS, ResourceLocation(MODID, "item/$seedsModelName"))
 
+    /** Returns the base item for Polymer rendering. */
     override fun getPolymerItem(p0: ItemStack?, p1: ServerPlayer?): Item = Items.WHEAT_SEEDS
 
+    /** Returns the custom model data value for this seed type. */
     override fun getPolymerCustomModelData(itemStack: ItemStack?, player: ServerPlayer?): Int = seedsModel.value()
-
 }
