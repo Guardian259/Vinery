@@ -38,7 +38,7 @@ object VineryObjectRegistry {
     val GRAPEVINE_STEM = register(
         BuiltInRegistries.BLOCK,
         ResourceLocation(MODID, "grapevine_stem"),
-        PaleStemBlock(BlockBehaviour.Properties.of().strength(2.0f).randomTicks().sound(SoundType.WOOD).noOcclusion())
+        PaleStemBlock("grapevine_stem", BlockBehaviour.Properties.of().strength(2.0f).randomTicks().sound(SoundType.WOOD).noOcclusion())
     )
 
     /** Fermentation barrel block, copied from barrel properties with no occlusion. */
@@ -227,7 +227,7 @@ object VineryObjectRegistry {
                 register(
                     BuiltInRegistries.BLOCK,
                     ResourceLocation(MODID, "${name}_lattice"),
-                    LatticeBlock(
+                    LatticeBlock("${name}_lattice",
                         BlockBehaviour.Properties.of()
                             .strength(2.0f, 3.0f)
                             .sound(plankBlock.getSoundType(plankBlock.defaultBlockState()))

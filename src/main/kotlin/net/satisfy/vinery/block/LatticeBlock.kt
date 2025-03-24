@@ -1,9 +1,13 @@
 package net.satisfy.vinery.block
 
+import eu.pb4.polymer.blocks.api.BlockModelType
+import eu.pb4.polymer.blocks.api.PolymerBlockModel
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
@@ -34,6 +38,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
+import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.util.GeneralUtil
 import java.util.*
@@ -46,7 +51,9 @@ import java.util.function.Consumer
  *
  * @param properties Block behavior properties
  */
-class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBlock {
+class LatticeBlock(modelName: String, properties: Properties?) : StemBlock(properties), PolymerBlock {
+
+    private var polymerBlockState: BlockState
 
     init {
         registerDefaultState(
@@ -56,6 +63,10 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
                 .setValue(BOTTOM, false)
                 .setValue(TYPE, GeneralUtil.LineConnectingType.NONE)
         )
+        this.polymerBlockState = PolymerBlockResourceUtils.requestBlock(
+            BlockModelType.TRANSPARENT_BLOCK,
+            PolymerBlockModel.of(ResourceLocation(MODID, "block/$modelName"))
+        )!!
     }
 
     /**
@@ -220,6 +231,9 @@ class LatticeBlock(properties: Properties?) : StemBlock(properties), PolymerBloc
 
     /** Returns the block used for Polymer visual replacement (oak stairs). */
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.OAK_STAIRS
+
+    /** Returns the custom model data value for this lattice block type. */
+    override fun getPolymerBlockState(state: BlockState?) = this.polymerBlockState
 
     companion object {
         /** Indicates if the lattice provides support. */

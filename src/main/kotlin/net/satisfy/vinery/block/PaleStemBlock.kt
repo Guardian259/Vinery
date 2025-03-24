@@ -1,9 +1,14 @@
 package net.satisfy.vinery.block
 
+import eu.pb4.polymer.blocks.api.BlockModelType
+import eu.pb4.polymer.blocks.api.PolymerBlockModel
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils
+import eu.pb4.polymer.blocks.api.PolymerTexturedBlock
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -25,10 +30,12 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
+import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.item.GrapeBushSeedItem
 import net.satisfy.vinery.registry.VineryGrapeRegistry.NONE
 import org.jetbrains.annotations.NotNull
 import java.util.*
+
 
 /**
  * A grapevine stem block with growth stages, supporting planting, harvesting, and extension upward.
@@ -38,10 +45,16 @@ import java.util.*
  * @param settings Block behavior properties
  */
 @SuppressWarnings("deprecation")
-class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
+class PaleStemBlock(modelName: String, settings: Properties?) : StemBlock(settings), PolymerBlock, PolymerTexturedBlock {
+
+    private var polymerBlockState: BlockState
 
     init {
         this.registerDefaultState(defaultBlockState().setValue(GRAPE, NONE).setValue(AGE, 0))
+        this.polymerBlockState = PolymerBlockResourceUtils.requestBlock(
+            BlockModelType.TRANSPARENT_BLOCK,
+            PolymerBlockModel.of(ResourceLocation(MODID, "block/$modelName"))
+        )!!
     }
 
     /** Returns the fixed collision shape of the stem (4x16x4 centered box). */
@@ -181,6 +194,9 @@ class PaleStemBlock(settings: Properties?) : StemBlock(settings), PolymerBlock {
 
     /** Returns the block used for Polymer visual replacement (oak fence). */
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.OAK_FENCE
+
+    /** Returns the custom model data value for this pale stem block. */
+    override fun getPolymerBlockState(state: BlockState?) = this.polymerBlockState
 
     companion object {
         /** Fixed collision shape of the stem (4x16x4 centered box). */

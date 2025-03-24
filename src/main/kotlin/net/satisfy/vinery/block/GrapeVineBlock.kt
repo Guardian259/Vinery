@@ -1,7 +1,12 @@
 package net.satisfy.vinery.block
 
+import eu.pb4.polymer.blocks.api.BlockModelType
+import eu.pb4.polymer.blocks.api.PolymerBlockModel
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils
+import eu.pb4.polymer.blocks.api.PolymerTexturedBlock
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -24,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.BlockHitResult
+import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 import net.satisfy.vinery.registry.VineryGrapeRegistry.retrieveGrapeSetByType
 import kotlin.math.min
@@ -36,7 +42,16 @@ import kotlin.math.min
  * @param settings Block behavior properties
  * @param type The grape type definition specifying fruit
  */
-class GrapeVineBlock(settings: Properties?, val type: GrapeTypeDefinition) : VineBlock(settings!!), BonemealableBlock, PolymerBlock {
+class GrapeVineBlock(settings: Properties?, val type: GrapeTypeDefinition) : VineBlock(settings!!), BonemealableBlock, PolymerBlock, PolymerTexturedBlock {
+
+    private var polymerBlockState: BlockState
+
+    init {
+        this.polymerBlockState = PolymerBlockResourceUtils.requestBlock(
+            BlockModelType.TRANSPARENT_BLOCK,
+            PolymerBlockModel.of(ResourceLocation(MODID, "block/${type.serializedName}")) //TODO:Resource Location Mismatch
+        )!!
+    }
 
     /**
      * Handles player interaction. Sterilizes with shears, harvests fruit if mature (age > 1),
@@ -151,4 +166,8 @@ class GrapeVineBlock(settings: Properties?, val type: GrapeTypeDefinition) : Vin
 
     /** Returns the block used for Polymer visual replacement (vanilla vine). */
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.VINE
+
+    /** Returns the custom model data value for this grapvine block type. */
+    override fun getPolymerBlockState(state: BlockState?) = this.polymerBlockState
+
 }
