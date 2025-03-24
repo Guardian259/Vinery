@@ -3,7 +3,6 @@ package net.satisfy.vinery.block
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
@@ -33,18 +32,32 @@ import net.satisfy.vinery.Vinery.Companion.config
 import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
 import kotlin.math.min
 
+/**
+ * A bush block representing grape plants with growth stages and harvestable fruit.
+ * Supports bonemeal growth and random ticking for natural progression.
+ * Implements [PolymerBlock] to mimic Minecraft's sweet berry bush visually.
+ *
+ * @param settings Block behavior properties
+ * @param type The grape type definition specifying seeds and fruit
+ */
 open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinition) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
 
-    
-    override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
-        return SHAPE
-    }
+    /**
+     * Returns the collision shape of the grape bush, a fixed 16x16x16 cube.
+     */
+    override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext) = SHAPE
 
-    override fun getCloneItemStack(world: BlockGetter, pos: BlockPos, state: BlockState): ItemStack {
-        return ItemStack(getType().getSeeds())
-    }
+    /**
+     * Returns the item stack dropped when the block is broken (grape seeds).
+     */
+    override fun getCloneItemStack(world: BlockGetter, pos: BlockPos, state: BlockState) = ItemStack(getType().getSeeds())
 
-    
+    /**
+     * Handles player interaction with the bush. Harvests fruit if mature (age > 1),
+     * resets to age 1 after harvesting. Bone meal is ignored if not fully grown.
+     *
+     * @return [InteractionResult.SUCCESS] if harvested, otherwise [InteractionResult.PASS] or parent result
+     */
     override fun use(
         state: BlockState,
         world: Level,
@@ -53,29 +66,28 @@ open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinitio
         hand: InteractionHand,
         hit: BlockHitResult
     ): InteractionResult {
-        val i: Int = state.getValue(AGE)
-        val bl = i == 3
-        if (!bl && player.getItemInHand(hand).`is`(Items.BONE_MEAL)) {
-            return InteractionResult.PASS
-        } else if (i > 1) {
-            val x = world.random.nextInt(2)
-            Block.popResource(world, pos, ItemStack(getType().getFruit(), x + (if (bl) 1 else 0)))
-            world.playSound(
-                null,
-                pos,
-                SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES,
-                SoundSource.BLOCKS,
-                1.0f,
-                0.8f + world.random.nextFloat() * 0.4f
-            )
-            world.setBlock(pos, state.setValue(AGE, 1), 2)
-            return InteractionResult.sidedSuccess(world.isClientSide)
-        } else {
-            return super.use(state, world, pos, player, hand, hit)
+        val age = state.getValue(AGE)
+        return when {
+            age < 3 && player.getItemInHand(hand).`is`(Items.BONE_MEAL) -> InteractionResult.PASS
+            age > 1 -> {
+                val isFullyGrown = age == 3
+                val fruitCount = world.random.nextInt(2) + if (isFullyGrown) 1 else 0
+                Block.popResource(world, pos, ItemStack(getType().getFruit(), fruitCount))
+                world.playSound(
+                    null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS,
+                    1.0f, 0.8f + world.random.nextFloat() * 0.4f
+                )
+                world.setBlock(pos, state.setValue(AGE, 1), 2)
+                InteractionResult.sidedSuccess(world.isClientSide)
+            }
+            else -> super.use(state, world, pos, player, hand, hit)
         }
     }
 
-    
+    /**
+     * Updates the bush's growth stage randomly based on config-defined chance,
+     * if light and placement conditions are met.
+     */
     override fun randomTick(state: BlockState, world: ServerLevel, pos: BlockPos, random: RandomSource) {
         val age: Int = state.getValue(AGE)
         val growthChance: Double = config!!.getOrDefault("grapeGrowthChance", 0.5)
@@ -86,27 +98,35 @@ open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinitio
         }
     }
 
-    override fun isRandomlyTicking(state: BlockState): Boolean {
-        return state.getValue<Int>(AGE) < 3
-    }
+    /**
+     * Indicates if the block should tick randomly (true if age < 3).
+     */
+    override fun isRandomlyTicking(state: BlockState) = state.getValue(AGE) < 3
 
+    /**
+     * Checks if the bush can be fertilized with bonemeal (true if age < 3).
+     */
     override fun isValidBonemealTarget(
         levelReader: LevelReader,
         blockPos: BlockPos,
         blockState: BlockState,
         bl: Boolean
-    ): Boolean {
-        return blockState.getValue<Int>(AGE) < 3
-    }
+    ) = blockState.getValue(AGE) < 3
 
-    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
-        return true
-    }
+    /**
+     * Determines if bonemeal application succeeds (always true).
+     */
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState) = true
 
-    open fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?): Boolean {
-        return world.getRawBrightness(blockPos, 0) > 9
-    }
+    /**
+     * Checks if the bush can grow at its current position based on light level.
+     * Defaults to requiring brightness > 9.
+     */
+    open fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?) = world.getRawBrightness(blockPos, 0) > 9
 
+    /**
+     * Verifies if the bush can survive at its position, combining growth and placement conditions.
+     */
     @Deprecated("Deprecated in Java",
         ReplaceWith("canGrowPlace(world, blockPos, blockState) && this.mayPlaceOn(world.getBlockState(blockPos.below()), world, blockPos)")
     )
@@ -118,33 +138,44 @@ open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinitio
         )
     }
 
-    protected override fun mayPlaceOn(floor: BlockState, world: BlockGetter, pos: BlockPos): Boolean {
-        return floor.isSolidRender(world, pos)
-    }
+    /**
+     * Checks if the bush can be placed on the given floor block (must be solid).
+     */
+    override fun mayPlaceOn(floor: BlockState, world: BlockGetter, pos: BlockPos) = floor.isSolidRender(world, pos)
 
-    private fun getType(): GrapeTypeDefinition {
-        return this.type
-    }
+    /** Returns the grape type definition for this bush. */
+    private fun getType() = this.type
 
+    /** The fruit item stack produced by this bush. */
     private val grapeType: ItemStack
         get() = ItemStack(getType().getFruit())
 
-
+    /**
+     * Applies bonemeal to increment the bush's age up to a maximum of 3.
+     */
     override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
         val i = min(3.0, (state.getValue<Int>(AGE) + 1).toDouble()).toInt()
         world.setBlock(pos, state.setValue<Int, Int>(AGE, i), 2)
     }
 
+    /**
+     * Adds the AGE property to the block's state definition.
+     */
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(AGE)
     }
 
+    /**
+     * A grape bush variant requiring high brightness (≥14) to grow.
+     */
     class SavannaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeTypeDefinition) : GrapeBush(settings, type) {
-        override fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?): Boolean {
-            return world.getRawBrightness(blockPos, 0) >= 14
-        }
+        override fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?) = world.getRawBrightness(blockPos, 0) >= 14
     }
 
+    /**
+     * A grape bush variant requiring moderate light (>4) and proximity to podzol,
+     * coarse dirt, or grass blocks within a 4-block radius.
+     */
     class TaigaGrapeBush(settings: BlockBehaviour.Properties?, type: GrapeTypeDefinition) : GrapeBush(settings, type) {
         override fun canGrowPlace(world: LevelReader, blockPos: BlockPos, blockState: BlockState?): Boolean {
             if (world.getRawBrightness(blockPos, 0) <= 4) {
@@ -159,32 +190,34 @@ open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinitio
                 if (!var2.hasNext()) {
                     return false
                 }
-
                 pos = var2.next()
             } while (!(world.getBlockState(pos).block === Blocks.PODZOL || world.getBlockState(pos)
                     .block === Blocks.COARSE_DIRT || world.getBlockState(pos).block === Blocks.GRASS_BLOCK)
             )
-
             return true
         }
 
+        /** Disables pathfinding through this bush. */
         @Deprecated("Deprecated in Java", ReplaceWith("false"))
         override fun isPathfindable(
             arg: BlockState,
             arg2: BlockGetter,
             arg3: BlockPos,
             arg4: PathComputationType
-        ): Boolean {
-            return false
-        }
+        ) = false
     }
 
+    /** Returns the block used for Polymer visual replacement (sweet berry bush). */
     override fun getPolymerBlock(p0: BlockState?): Block = Blocks.SWEET_BERRY_BUSH
 
+    /** Maps this block’s state to the Polymer block’s state, preserving AGE. */
     override fun getPolymerBlockState(state: BlockState?): BlockState = Blocks.SWEET_BERRY_BUSH.defaultBlockState().setValue(AGE, state!!.getValue(AGE))
 
     companion object {
+        /** Block state property for growth stage (0-3). */
         val AGE: IntegerProperty = BlockStateProperties.AGE_3
+
+        /** Fixed collision shape of the bush (16x16x16 cube). */
         private val SHAPE: VoxelShape = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)
     }
 }
