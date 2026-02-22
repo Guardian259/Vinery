@@ -34,6 +34,8 @@ import org.jetbrains.annotations.NotNull
  */
 abstract class StemBlock(settings: Properties?) : Block(settings!!), BonemealableBlock, PolymerBlock {
 
+    abstract var polymerBlockState: BlockState
+
     /**
      * Drops grapes based on maturity (1-3 if mature, 1-2 if not) in the specified direction or at the block position.
      */

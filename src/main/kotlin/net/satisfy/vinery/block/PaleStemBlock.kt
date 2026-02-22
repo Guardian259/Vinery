@@ -47,7 +47,7 @@ import java.util.*
 @SuppressWarnings("deprecation")
 class PaleStemBlock(modelName: String, settings: Properties?) : StemBlock(settings), PolymerBlock, PolymerTexturedBlock {
 
-    private var polymerBlockState: BlockState
+    override var polymerBlockState: BlockState
 
     init {
         this.registerDefaultState(defaultBlockState().setValue(GRAPE, NONE).setValue(AGE, 0))

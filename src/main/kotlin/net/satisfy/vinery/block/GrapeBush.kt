@@ -1,7 +1,12 @@
 package net.satisfy.vinery.block
 
+import eu.pb4.polymer.blocks.api.BlockModelType
+import eu.pb4.polymer.blocks.api.PolymerBlockModel
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils
+import eu.pb4.polymer.blocks.api.PolymerTexturedBlock
 import eu.pb4.polymer.core.api.block.PolymerBlock
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -28,8 +33,12 @@ import net.minecraft.world.level.pathfinder.PathComputationType
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
+import net.satisfy.vinery.Vinery.Companion.MODID
 import net.satisfy.vinery.Vinery.Companion.config
+import net.satisfy.vinery.block.StemBlock.Companion
+import net.satisfy.vinery.block.StemBlock.Companion.GRAPE
 import net.satisfy.vinery.registry.VineryGrapeRegistry.GrapeTypeDefinition
+import net.satisfy.vinery.registry.VineryGrapeRegistry.NONE
 import kotlin.math.min
 
 /**
@@ -40,7 +49,7 @@ import kotlin.math.min
  * @param settings Block behavior properties
  * @param type The grape type definition specifying seeds and fruit
  */
-open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinition) : BushBlock(settings!!), BonemealableBlock, PolymerBlock {
+open class GrapeBush(settings: Properties?, private val type: GrapeTypeDefinition) : BushBlock(settings!!), BonemealableBlock, PolymerBlock, PolymerTexturedBlock {
 
     /**
      * Returns the collision shape of the grape bush, a fixed 16x16x16 cube.

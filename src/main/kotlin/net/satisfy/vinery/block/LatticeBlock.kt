@@ -53,7 +53,7 @@ import java.util.function.Consumer
  */
 class LatticeBlock(modelName: String, properties: Properties?) : StemBlock(properties), PolymerBlock {
 
-    private var polymerBlockState: BlockState
+    override var polymerBlockState: BlockState
 
     init {
         registerDefaultState(
